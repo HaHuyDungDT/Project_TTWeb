@@ -39,6 +39,7 @@
                     <li><a><i class="fa fa-user-o"></i> <%= new userServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a></li>
                     <li><a href="logout"><i class="fa fa-user-o"></i> Đăng xuất</a></li>
                 </c:if>
+
             </ul>
         </div>
     </div>
@@ -105,3 +106,4 @@
 <!-- /HEADER -->
 </body>
 </html>
+

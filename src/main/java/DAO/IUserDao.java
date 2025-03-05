@@ -18,4 +18,8 @@ public interface IUserDao {
     void deleteById(String id);
     void update(User user);
     void add(User user);
+    // Thêm phương thức để thêm người dùng qua Google
+
+    void addGoogleUser(User user);
 }
+

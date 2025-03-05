@@ -1,8 +1,11 @@
 package DAO.impl;
 
 import DAO.IUserDao;
+import db.JDBIConector;
 import mapper.impl.userMapperImpl;
 import Model.User;
+import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
 
@@ -95,4 +98,25 @@ public class userDaoImpl extends abstractDaoImpl<User> implements IUserDao {
         String sql = "insert into users values(?,?,?,?,?,?,?,?,?,?)";
         query_update(sql, user.getId(), user.getName(), user.getSex(), user.getAddress(), user.getBirth_day(), user.getPhone_number(), user.getEmail(), user.getUser_name(), user.getPassword(), user.getRole_idStr());
     }
+
+    @Override
+    public void addGoogleUser(User user) {
+        try (Handle handle = JDBIConector.me().open()) {
+            handle.createUpdate("INSERT INTO users (id, name, sex, address, phone_number, email, user_name, password, role_id) " +
+                            "VALUES (:id, :name, :sex, :address, :phone_number, :email, :user_name, :password, :role_id)")
+                    .bind("id", user.getId())
+                    .bind("name", user.getName())
+                    .bind("sex", user.getSex())
+                    .bind("address", user.getAddress())
+                    .bind("phone_number", user.getPhone_number())
+                    .bind("email", user.getEmail())
+                    .bind("user_name", user.getUser_name())
+                    .bind("password", "")  // Password is empty for Google users
+                    .bind("role_id", user.getRole_idStr())
+                    .execute();
+        }
+    }
+
+
 }
+

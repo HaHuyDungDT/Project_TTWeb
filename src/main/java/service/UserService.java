@@ -4,13 +4,11 @@ import DAO.RoleDAO;
 import DAO.UserDAO;
 import Model.Role;
 import Model.User;
-import db.JDBIConector;
+import db.JDBIConnector;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class UserService {
@@ -31,7 +29,7 @@ public class UserService {
     }
 
     public static void main(String[] args) throws SQLException {
-        List<User> users = JDBIConector.me().withHandle((handle -> {
+        List<User> users = JDBIConnector.me().withHandle((handle -> {
             return handle.createQuery("SELECT id, name, sex, address, birth_day, phone_number, " +
                             "email, user_name, password, role_id FROM users")
                     .map((rs, ctx) -> {

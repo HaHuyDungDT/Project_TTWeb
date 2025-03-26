@@ -1,16 +1,16 @@
-package model;
+package model.cart;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import model.Product;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDetails {
+public class CartItem {
     private String id;
-    private Order order;
-    private double amount;
-    private Product product;
-    private int quantity;
+    private Integer cartId;
+    private Integer productId;
+    private Integer quantity;
 }

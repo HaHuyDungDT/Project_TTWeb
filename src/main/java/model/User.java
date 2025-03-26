@@ -22,5 +22,4 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer status;
-
 }

@@ -19,7 +19,7 @@ public class userServiceImpl implements IUserService {
     public boolean login(String username, String password) {
         // Đối với chức năng đăng nhập, cần lấy user từ DB rồi so sánh mật khẩu đã mã hóa
         User user = DAO.getByUsername(username);
-        if(user == null) {
+        if(user == null|| isUserLocked(username)) {
             return false;
         }
         // Sử dụng BCrypt để so sánh mật khẩu
@@ -27,6 +27,11 @@ public class userServiceImpl implements IUserService {
             return true;
         }
         return false;
+    }
+    @Override
+    public boolean isUserLocked(String username) {
+        User user = DAO.getByUsername(username);
+        return user != null && user.isLocked(); // Giả sử User có phương thức isLocked()
     }
 
     @Override

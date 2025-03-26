@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
-    private int id;
-    private String roleName;
+public class CartResponse {
+    private Product product;
+    private Integer quantity;
 }

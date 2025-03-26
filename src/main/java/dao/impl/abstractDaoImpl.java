@@ -1,4 +1,4 @@
-package dao.impl;
+package DAO.impl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import dao.IAbstractDao;
+import DAO.IAbstractDao;
 import mapper.IRowMapper;
 
 public class abstractDaoImpl<T> implements IAbstractDao<T>{

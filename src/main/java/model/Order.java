@@ -18,6 +18,4 @@ public class Order {
     private Date orderDate;
     private Date deliveryDate;
     private Double totalPrice;
-
-
 }

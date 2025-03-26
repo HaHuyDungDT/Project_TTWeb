@@ -5,9 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Role {
-    private int id;
-    private String roleName;
+@NoArgsConstructor
+public class Image {
+    private Integer id;
+    private String linkImage;
+    private Integer productId;
 }

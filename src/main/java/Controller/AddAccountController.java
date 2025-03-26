@@ -1,7 +1,7 @@
 package Controller;
 
-import Model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import model.User;
 import service.IUserService;
 import service.impl.userServiceImpl;
 
@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 
 @WebServlet(value = "/account/add")
 public class AddAccountController extends HttpServlet {
@@ -45,23 +46,25 @@ public class AddAccountController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules(); // Hỗ trợ LocalDate, LocalDateTime
+
         try {
-            User user = new User(
-                    req.getParameter("name"),
-                    req.getParameter("gender"),
-                    req.getParameter("address"),
-                    new java.sql.Date(dateFormat.parse(req.getParameter("date")).getTime()),
-                    req.getParameter("phone"),
-                    req.getParameter("email"),
-                    req.getParameter("user"),
-                    req.getParameter("password")
-            );
+            // Chuyển đổi request parameter sang User model
+            User user = mapper.readValue(req.getInputStream(), User.class);
+
+            // Set thêm thông tin mặc định (nếu cần)
+            user.setRoleId(Integer.parseInt(req.getParameter("role")));
+            user.setStatus(1); // trạng thái mặc định kích hoạt
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
+
             userService.add(user, req.getParameter("role"));
             resp.sendRedirect("/quanlytaikhoan");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
-
     }
+
 }

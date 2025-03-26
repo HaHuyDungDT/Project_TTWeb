@@ -1,6 +1,7 @@
 package Controller;
 
-import Model.User;
+import model.User;
+import model.User;
 import service.IUserService;
 import service.impl.userServiceImpl;
 import utils.SessionUtil;

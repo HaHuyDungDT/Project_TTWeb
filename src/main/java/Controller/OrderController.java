@@ -2,15 +2,16 @@ package Controller;
 
 import Cart.Cart;
 import Cart.CartProduct;
-import DAO.IUserDao;
-import DAO.OrderDAO;
-import DAO.OrderDetailsDAO;
-import DAO.UserDAO;
-import DAO.impl.userDaoImpl;
+import dao.IUserDao;
+import dao.OrderDAO;
+import dao.OrderDetailsDAO;
+import dao.UserDAO;
+import dao.impl.userDaoImpl;
+import model.OrderDetails;
+import model.User;
 import service.IUserService;
 import service.UserService;
 import service.impl.userServiceImpl;
-import Model.*;
 import utils.MailUtil;
 
 import javax.servlet.RequestDispatcher;

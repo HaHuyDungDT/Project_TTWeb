@@ -1,6 +1,10 @@
 package Cart;
 
 import Model.Product;
+<<<<<<< HEAD
+=======
+import model.cart.CartProduct;
+>>>>>>> 445a502 (Tạm lưu các thay đổi trên main)
 import service.ProductService;
 
 import java.util.ArrayList;
@@ -77,6 +81,10 @@ public class Cart {
         System.out.println(c.amount(a));
 
     }
+<<<<<<< HEAD
 }
 
 
+=======
+}
+>>>>>>> 445a502 (Tạm lưu các thay đổi trên main)

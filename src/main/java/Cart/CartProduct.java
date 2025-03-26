@@ -47,4 +47,8 @@ public class CartProduct {
                 ", product=" + product +
                 '}';
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 445a502 (Tạm lưu các thay đổi trên main)

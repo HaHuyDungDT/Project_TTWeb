@@ -1,8 +1,9 @@
 package Controller;
 
-import DAO.ProductDAO;
-import Model.Product;
+
 import com.google.gson.Gson;
+import dao.ProductDAO;
+import model.Product;
 
 import java.io.IOException;
 import java.util.List;

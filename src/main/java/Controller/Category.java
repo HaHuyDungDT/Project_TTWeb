@@ -1,7 +1,8 @@
 package Controller;
 
-import DAO.ProductDAO;
-import Model.Product;
+import dao.ProductDAO;
+import model.Product;
+import model.Product;
 
 import javax.servlet.*;
 import javax.servlet.http.*;

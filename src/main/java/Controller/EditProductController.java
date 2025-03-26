@@ -1,11 +1,12 @@
 package Controller;
 
-import DAO.ProducerDAO;
-import DAO.ProductDAO;
-import DAO.ProductTypeDAO;
-import Model.Producer;
-import Model.Product;
-import Model.ProductType;
+import dao.ProducerDAO;
+import dao.ProductDAO;
+import dao.ProductTypeDAO;
+import model.Producer;
+import model.Product;
+import model.ProductType;
+import model.Producer;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 @WebServlet(name = "EditProductController", value = "/edit")
 public class EditProductController extends HttpServlet {
@@ -28,18 +30,34 @@ public class EditProductController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
         try {
-            String id = request.getParameter("id");
+            Integer id = Integer.parseInt(request.getParameter("id"));
             String name = request.getParameter("name");
-            double price = Double.parseDouble(request.getParameter("price"));
-            String productTypeId = request.getParameter("productType");
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            String productCategoryId = request.getParameter("productCategory");
+            Double price = Double.parseDouble(request.getParameter("price"));
+            Integer productTypeId = Integer.parseInt(request.getParameter("productType"));
+            Integer quantity = Integer.parseInt(request.getParameter("quantity"));
+            Integer productCategoryId = Integer.parseInt(request.getParameter("productCategory"));
             String img = request.getParameter("img");
 
             ProductType productType = productTypeDAO.getById(productTypeId);
             Producer producer = producerDAO.getById(productCategoryId);
 
-            Product product = new Product(id, name, price, productType, quantity, producer, img);
+            Product product = new Product(
+                    id,
+                    name,
+                    price,
+                    productType.getId(),
+                    productType,
+                    quantity,
+                    producer.getId(),
+                    producer,
+                    "Active",
+                    new Date(),
+                    null,               // couponId
+                    "",                 // detail
+                    new ArrayList<>(),  // images
+                    new ArrayList<>()   // rates
+            );
+
             productDAO.update(product);
             request.getSession().setAttribute("editProductSuccess", true);
             response.sendRedirect("quanlysanpham.jsp");
@@ -47,7 +65,7 @@ public class EditProductController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
 
 }

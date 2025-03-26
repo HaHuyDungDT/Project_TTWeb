@@ -1,8 +1,9 @@
 
 package service.impl;
 
-import DAO.ProductDAO;
-import Model.Product;
+import dao.ProductDAO;
+import model.Product;
+import model.Product;
 import service.ProductService;
 
 import java.util.List;

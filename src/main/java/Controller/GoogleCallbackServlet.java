@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.User;
+import model.User;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -22,12 +22,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @WebServlet("/google-callback")
 public class GoogleCallbackServlet extends HttpServlet {
 
-    // Lấy thông tin từ biến môi trường
     private static final String CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
     private static final String CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
     private static final String REDIRECT_URI = System.getenv("REDIRECT_URI");
@@ -36,7 +36,6 @@ public class GoogleCallbackServlet extends HttpServlet {
         String code = request.getParameter("code");
 
         if (code != null) {
-            // Truy cập token từ Google
             String tokenEndpoint = "https://oauth2.googleapis.com/token";
             URL url = new URL(tokenEndpoint);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -54,9 +53,7 @@ public class GoogleCallbackServlet extends HttpServlet {
                 os.flush();
             }
 
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Xử lý token và lấy thông tin người dùng
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                     StringBuilder content = new StringBuilder();
                     String inputLine;
@@ -66,51 +63,44 @@ public class GoogleCallbackServlet extends HttpServlet {
 
                     JSONObject tokenResponse = new JSONObject(content.toString());
                     String idToken = tokenResponse.getString("id_token");
-                    GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                            .setAudience(Collections.singletonList(CLIENT_ID))
-                            .build();
 
-                    GoogleIdToken idTokenObj = null;
+                    GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                            .setAudience(Collections.singletonList(CLIENT_ID)).build();
+
+                    GoogleIdToken idTokenObj;
                     try {
                         idTokenObj = verifier.verify(idToken);
                     } catch (GeneralSecurityException e) {
                         throw new RuntimeException(e);
                     }
+
                     if (idTokenObj != null) {
                         GoogleIdToken.Payload payload = idTokenObj.getPayload();
                         String email = payload.getEmail();
                         String name = (String) payload.get("name");
-                        String picture = (String) payload.get("picture");
 
-                        // Tạo hoặc lấy người dùng
                         IUserService userService = new userServiceImpl();
                         User existingUser = userService.getByUsername(email);
 
                         if (existingUser != null) {
-                            // Lưu thông tin người dùng vào phiên
-                            SessionUtil.getInstance().putKey(request, "userEmail", email);
-                            SessionUtil.getInstance().putKey(request, "userName", name);
-                            SessionUtil.getInstance().putKey(request, "userPicture", picture);
-                            SessionUtil.getInstance().putKey(request, "user", existingUser.getId());
+                            SessionUtil.getInstance().putKey(request, "user", existingUser);
                         } else {
-                            // Tạo người dùng mới
                             User newUser = new User();
-                            newUser.setId(userService.createId());
-                            newUser.setEmail(email);
-                            newUser.setName(name);
-                            newUser.setUser_name(email.split("@")[0]);
+                            newUser.setUsername(email.split("@")[0]);
                             newUser.setPassword("");
-                            newUser.setSex("Unknown");
-                            newUser.setAddress("Unknown");
-                            newUser.setPhone_number("Unknown");
-                            newUser.setRole_idStr("0");
+                            newUser.setOauthProvider("google");
+                            newUser.setOauthUid(payload.getSubject());
+                            newUser.setOauthToken(idToken);
+                            newUser.setName(name);
+                            newUser.setEmail(email);
+                            newUser.setRoleId(0);
+                            newUser.setCreatedAt(LocalDateTime.now());
+                            newUser.setUpdatedAt(LocalDateTime.now());
+                            newUser.setStatus(1);
 
                             userService.addGoogleUser(newUser);
 
-                            // Lưu thông tin người dùng mới vào phiên
-                            SessionUtil.getInstance().putKey(request, "userEmail", email);
-                            SessionUtil.getInstance().putKey(request, "userName", name);
-                            SessionUtil.getInstance().putKey(request, "user", newUser.getId());
+                            SessionUtil.getInstance().putKey(request, "user", newUser);
                         }
                         response.sendRedirect("index.jsp");
                     } else {

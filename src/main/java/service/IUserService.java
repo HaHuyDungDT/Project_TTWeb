@@ -1,24 +1,25 @@
 package service;
 
-import Model.User;
+import model.User;
 
 import java.util.List;
 
 public interface IUserService {
     boolean login(String username, String password);
-    String register(User user);
+    String register(model.User user);
     boolean isUsernameExists(String username);
     String getIdByUsername(String username);
-    User getByUsername(String username);
-    User getById(String id);
+    model.User getByUsername(String username);
+    model.User getById(String id);
     boolean isEmailExists(String email);
     void resetPass(String email, String password);
-    List<User> findAll();
+    List<model.User> findAll();
     void deleteById(String id);
-    void update(User user);
-    void add(User user, String role);
+    void update(model.User user);
+    void add(model.User user, String role);
 
-    void addGoogleUser(User newUser);
+    void addGoogleUser(model.User newUser);
 
     String createId();
+    boolean isUserLocked(String username);
 }

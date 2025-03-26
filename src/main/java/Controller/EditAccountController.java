@@ -1,7 +1,10 @@
 package Controller;
 
-import Model.User;
+import model.User;
+import service.IUserService;
+import service.impl.userServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import model.User;
 import service.IUserService;
 import service.impl.userServiceImpl;
 
@@ -11,9 +14,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @WebServlet(value = "/account/edit")
 public class EditAccountController extends HttpServlet {
@@ -24,30 +28,42 @@ public class EditAccountController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(resp.getOutputStream(), userService.getById(req.getParameter("id")).getAddress());
+        Integer id = Integer.parseInt(req.getParameter("id"));
+        User user = userService.getById(id);
+        objectMapper.writeValue(resp.getOutputStream(), user);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         try {
-            User user = new User(
-                    req.getParameter("name"),
-                    req.getParameter("gender"),
-                    req.getParameter("address"),
-                    new java.sql.Date(dateFormat.parse(req.getParameter("date")).getTime()),
-                    req.getParameter("phone"),
-                    req.getParameter("email"),
-                    req.getParameter("user"),
-                    req.getParameter("password")
-            );
-            user.setId(req.getParameter("id"));
-            userService.update(user);
+            Integer id = Integer.parseInt(req.getParameter("id"));
+
+            User existingUser = userService.getById(id);
+
+            existingUser.setName(req.getParameter("name"));
+            existingUser.setEmail(req.getParameter("email"));
+            existingUser.setUsername(req.getParameter("user"));
+            existingUser.setPassword(req.getParameter("password"));
+
+            // Các trường OAuth (nếu không đổi thì có thể giữ nguyên giá trị cũ)
+            existingUser.setOauthProvider(existingUser.getOauthProvider());
+            existingUser.setOauthUid(existingUser.getOauthUid());
+            existingUser.setOauthToken(existingUser.getOauthToken());
+
+            // roleId và status có thể set giá trị mặc định hoặc giữ nguyên giá trị hiện tại
+            existingUser.setRoleId(existingUser.getRoleId());
+            existingUser.setStatus(existingUser.getStatus());
+
+            // Cập nhật lại ngày chỉnh sửa
+            existingUser.setUpdatedAt(LocalDateTime.now());
+
+            userService.update(existingUser);
+
             resp.sendRedirect("/quanlytaikhoan");
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         }
-
     }
 }

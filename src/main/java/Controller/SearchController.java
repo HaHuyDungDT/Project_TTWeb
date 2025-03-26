@@ -1,6 +1,7 @@
 package Controller;
 
-import Model.Product;
+import model.Product;
+import model.Product;
 import service.impl.ProductServiceImpl;
 
 import java.io.IOException;

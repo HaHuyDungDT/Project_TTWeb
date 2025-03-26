@@ -1,5 +1,6 @@
 package Controller;
 
+import model.User;
 import service.IUserService;
 import service.impl.userServiceImpl;
 import utils.SessionUtil;
@@ -24,20 +25,31 @@ public class LoginController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("username",req.getParameter("username"));
-        req.setAttribute("password",req.getParameter("password"));
-        if(userService.login(req.getParameter("username"), req.getParameter("password"))){
-            req.setAttribute("success", "Đăng nhập thành công!");
-            req.setAttribute("username","");
-            req.setAttribute("password","");
-            SessionUtil.getInstance().putKey(req, "user", userService.getIdByUsername(req.getParameter("username")));
-            if(userService.getById(SessionUtil.getInstance().getKey(req, "user").toString()).getRole_idStr().equals("1")){
-                resp.sendRedirect("admin.jsp");
-            }else{
-                RequestDispatcher dispatcher = req.getRequestDispatcher("dangnhap.jsp");
-                dispatcher.forward(req, resp);
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+
+        req.setAttribute("username", username);
+        req.setAttribute("password", password);
+
+        if (userService.login(username, password)) {
+            User loggedInUser = userService.getByUsername(username);
+
+            if (loggedInUser != null) {
+                SessionUtil.getInstance().putKey(req, "user", loggedInUser);
+                req.setAttribute("success", "Đăng nhập thành công!");
+                req.setAttribute("username", "");
+                req.setAttribute("password", "");
+
+                if (loggedInUser.getRoleId() == 1) { // Admin
+                    resp.sendRedirect("admin.jsp");
+                } else { // Regular User
+                    resp.sendRedirect("index.jsp");
+                }
+            } else {
+                req.setAttribute("error", "Không tìm thấy thông tin người dùng!");
+                req.getRequestDispatcher("dangnhap.jsp").forward(req, resp);
             }
-        }else{
+        } else {
             req.setAttribute("error", "Tên người dùng hoặc mật khẩu không chính xác!");
             RequestDispatcher dispatcher = req.getRequestDispatcher("dangnhap.jsp");
             dispatcher.forward(req, resp);

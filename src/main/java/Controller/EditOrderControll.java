@@ -1,8 +1,8 @@
 package Controller;
 
-import DAO.OrderDAO;
-import DAO.UserDAO;
-import Model.Order;
+import dao.OrderDAO;
+import dao.UserDAO;
+import model.Order;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -49,10 +49,10 @@ public class EditOrderControll extends HttpServlet {
         } else {
             Order o = new Order();
             o.setId(id);
-            o.setUser(new UserDAO().getById(userId));
+            o.setUser(new UserDAO().getById(Integer.valueOf(userId)));
             o.setAddress(address);
             o.setStatus(orderStatus);
-            o.setPayMent(payment);
+            o.setPayment_method(payment);
             o.setOrderDate(orderDate);
             o.setDeliveryDate(deliveryDate);
 

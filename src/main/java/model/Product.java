@@ -2,6 +2,7 @@
 
     import lombok.*;
 
+    import java.awt.*;
     import java.util.Date;
     import java.util.List;
 
@@ -22,6 +23,5 @@
         private Integer couponId;
         private String detail;
         private List<Image> images;
-        private List<Rate> rates;
     }
 

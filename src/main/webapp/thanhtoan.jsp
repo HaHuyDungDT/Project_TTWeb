@@ -1,5 +1,5 @@
 <%@ page import="java.util.Map" %>
-<%@ page import="Model.Product" %>
+<%@ page import="model.Product" %>
 <%@ page import="java.util.List" %>
 <%@ page import="Cart.CartProduct" %>
 <%@ page import="Cart.Cart" %>
@@ -37,8 +37,8 @@
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
 
 
-    <jsp:useBean id="a" class="DAO.OrderDetailsDAO" scope="request"/>
-    <jsp:useBean id="b" class="DAO.OrderDAO" scope="request"/>
+    <jsp:useBean id="a" class="dao.OrderDetailsDAO" scope="request"/>
+    <jsp:useBean id="b" class="dao.OrderDAO" scope="request"/>
 </head>
 <body>
 

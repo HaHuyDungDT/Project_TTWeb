@@ -29,7 +29,7 @@
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
 
-    <jsp:useBean id="a" class="DAO.PolicyDAO" scope="request"/>
+    <jsp:useBean id="a" class="dao.PolicyDAO" scope="request"/>
 
 
 </head>

@@ -1,11 +1,10 @@
 package service.impl;
 
-import DAO.IRoleDao;
-import DAO.IUserDao;
-import DAO.impl.roleDaoImpl;
-import DAO.impl.userDaoImpl;
-import Model.Role;
-import Model.User;
+import dao.IRoleDao;
+import dao.IUserDao;
+import dao.impl.roleDaoImpl;
+import dao.impl.userDaoImpl;
+import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 import service.IUserService;
 

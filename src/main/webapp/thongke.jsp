@@ -1,8 +1,8 @@
 <%@ page import="service.impl.userServiceImpl" %>
 <%@ page import="utils.SessionUtil" %>
-<%@ page import="Model.Parameter" %>
+<%@ page import="model.Parameter" %>
 <%@ page import="java.util.List" %>
-<%@ page import="DAO.ParameterDAO" %>
+<%@ page import="dao.ParameterDAO" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -14,8 +14,8 @@
     }
 %>
 
-<jsp:useBean id="a" class="DAO.OrderDAO" scope="request"></jsp:useBean>
-<jsp:useBean id="b" class="DAO.OrderDetailsDAO" scope="request"></jsp:useBean>
+<jsp:useBean id="a" class="dao.OrderDAO" scope="request"></jsp:useBean>
+<jsp:useBean id="b" class="dao.OrderDetailsDAO" scope="request"></jsp:useBean>
 <c:set var="currentDate" value="<%=java.time.LocalDate.now()%>"/>
 
 <!DOCTYPE html>

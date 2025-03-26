@@ -1,9 +1,8 @@
 package Controller;
 
-import DAO.OrderDAO;
-import DAO.UserDAO;
-import Model.Order;
-import Model.User;
+import dao.OrderDAO;
+import dao.UserDAO;
+import model.Order;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

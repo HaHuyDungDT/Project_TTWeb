@@ -1,7 +1,7 @@
 package mapper.impl;
 
 import mapper.IRowMapper;
-import Model.User;
+import model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

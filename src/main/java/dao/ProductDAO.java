@@ -5,7 +5,6 @@ import model.Producer;
 import model.Product;
 import model.ProductType;
 import model.Image; // Nếu có dùng
-import model.Rate;  // Nếu có dùng
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -60,11 +59,11 @@ public class ProductDAO {
                         Date importDate = rs.getDate("import_date");
 
                         // Tạo Producer tạm, rồi selectById -> lấy đầy đủ
-                        Producer producer = new ProducerDAO()
+                        Producer producer = new dao.ProducerDAO()
                                 .selectById(new Producer(producerId, null, null, null));
 
                         // Tạo ProductType tạm, rồi selectById
-                        ProductType productType = new ProductTypeDAO()
+                        ProductType productType = new dao.ProductTypeDAO()
                                 .selectById(new ProductType(productTypeId, null));
 
                         // Tạo Product khớp với model
@@ -164,10 +163,10 @@ public class ProductDAO {
 
             ResultSet rs = st.executeQuery();
 
-            ProductTypeDAO productTypeDAO = new ProductTypeDAO();
-            ProducerDAO producerDAO = new ProducerDAO();
-            ImageDAO imageDAO = new ImageDAO(); // Nếu có
-            RateDAO rateDAO = new RateDAO();    // Nếu có
+            dao.ProductTypeDAO productTypeDAO = new dao.ProductTypeDAO();
+            dao.ProducerDAO producerDAO = new dao.ProducerDAO();
+            dao.ImageDAO imageDAO = new dao.ImageDAO(); // Nếu có
+            dao.RateDAO rateDAO = new dao.RateDAO();    // Nếu có
 
             while (rs.next()) {
                 Product pro = new Product();
@@ -280,8 +279,8 @@ public class ProductDAO {
                             String detail = rs.getString("detail");
                             Date import_date = rs.getDate("import_date");
 
-                            Producer producer = new ProducerDAO().selectById(new Producer(producer_id, null, null, null));
-                            ProductType productType = new ProductTypeDAO().selectById(new ProductType(productType_id, null));
+                            Producer producer = new dao.ProducerDAO().selectById(new Producer(producer_id, null, null, null));
+                            ProductType productType = new dao.ProductTypeDAO().selectById(new ProductType(productType_id, null));
 
                             return new Product(
                                     id,

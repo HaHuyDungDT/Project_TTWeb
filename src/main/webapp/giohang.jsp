@@ -1,7 +1,7 @@
 <%@ page import="Cart.Cart" %>
 <%@ page import="Cart.CartProduct" %>
 <%@ page import="java.util.List" %>
-<%@ page import="Model.Product" %>
+<%@ page import="model.Product" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"  language="java" %>
@@ -34,7 +34,7 @@
     <!-- Custom stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
 
-    <jsp:useBean id="a" class="DAO.NewProductDAO" scope="request"/>
+    <jsp:useBean id="a" class="dao.NewProductDAO" scope="request"/>
 </head>
 <body>
 <!-- HEADER -->

@@ -1,6 +1,6 @@
 package Controller;
 
-import Model.Product;
+import model.Product;
 import com.google.gson.Gson;
 import service.impl.ProductServiceImpl;
 
@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
-import java.io.IOException;
 
 @WebServlet(name = "ProductDetailsController", value = "/productDetails")
 public class ProductDetailsController extends HttpServlet {

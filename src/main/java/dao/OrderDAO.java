@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class OrderDAO {
                             Date deliveryDate = rs.getDate("delivery_date");
                             Double totalPrice = rs.getDouble("total_price");
 
-                            User user = new UserDAO().selectById(userId); // chỉ cần id, hàm DAO nhận Integer
+                            User user = new dao.UserDAO().selectById(userId); // chỉ cần id, hàm DAO nhận Integer
 
                             return new Order(
                                     String.valueOf(id),

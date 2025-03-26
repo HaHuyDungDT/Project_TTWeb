@@ -1,8 +1,8 @@
-<%@ page import="Model.Product" %>
-<%@ page import="DAO.ProductDAO" %>
+<%@ page import="model.Product" %>
+<%@ page import="dao.ProductDAO" %>
 <%@ page import="java.util.List" %>
-<%@ page import="DAO.ProductTypeDAO" %>
-<%@ page import="DAO.ProducerDAO" %>
+<%@ page import="dao.ProductTypeDAO" %>
+<%@ page import="dao.ProducerDAO" %>
 <%@ page import="java.util.Objects" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -31,9 +31,9 @@
 
     <link rel="stylesheet" type="text/css" href="css/styleAdmin.css">
 
-    <jsp:useBean id="a" class="DAO.ProductDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="b" class="DAO.ProducerDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="c" class="DAO.ProductTypeDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="a" class="dao.ProductDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="b" class="dao.ProducerDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="c" class="dao.ProductTypeDAO" scope="request"></jsp:useBean>
 </head>
 <body class="overlay-scrollbar">
 <!-- navbar -->

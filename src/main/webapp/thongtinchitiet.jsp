@@ -1,10 +1,10 @@
-<%@ page import="DAO.impl.userDaoImpl" %>
-<%@ page import="Model.User" %>
-<%@ page import="DAO.OrderDAO" %>
-<%@ page import="Model.Order" %>
+<%@ page import="dao.impl.userDaoImpl" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.OrderDAO" %>
+<%@ page import="model.Order" %>
 <%@ page import="java.util.List" %>
-<%@ page import="DAO.OrderDetailsDAO" %>
-<%@ page import="Model.OrderDetails" %>
+<%@ page import="dao.OrderDetailsDAO" %>
+<%@ page import="model.OrderDetails" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -51,7 +51,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <jsp:useBean id="a" class="DAO.impl.userDaoImpl" scope="request"/>
+    <jsp:useBean id="a" class="dao.impl.userDaoImpl" scope="request"/>
 
     <style>
 

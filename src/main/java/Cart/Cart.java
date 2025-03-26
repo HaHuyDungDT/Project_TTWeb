@@ -1,6 +1,6 @@
 package Cart;
 
-import Model.Product;
+import model.Product;
 <<<<<<< HEAD
 =======
 import model.cart.CartProduct;

@@ -2,17 +2,14 @@ package model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producer {
+public class Rate {
     private Integer id;
-    private String name;
-    private String code;
-    private List<model.Product> products;
+    private Integer star;
+    private Integer comment;   // Vì cột `comment` đang để kiểu int
+    private Integer productId;
 }

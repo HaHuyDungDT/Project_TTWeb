@@ -30,10 +30,10 @@
     <!-- stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
 
-    <jsp:useBean id="a" class="DAO.SaleProductDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="b" class="DAO.SellingProductDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="c" class="DAO.NewProductDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="d" class="Model.ProductType" scope="request"></jsp:useBean>
+    <jsp:useBean id="a" class="dao.SaleProductDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="b" class="dao.SellingProductDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="c" class="dao.NewProductDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="d" class="model.ProductType" scope="request"></jsp:useBean>
 
 </head>
 <body>

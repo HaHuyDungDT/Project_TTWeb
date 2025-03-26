@@ -18,7 +18,7 @@ public class RateDAO {
                             Rate rate = new Rate();
                             rate.setId(rs.getInt("id"));
                             rate.setStar(rs.getInt("star"));
-                            rate.setComment(String.valueOf(rs.getInt("comment")));   // comment kiểu int như trong DB
+                            rate.setComment(Integer.valueOf(String.valueOf(rs.getInt("comment"))));   // comment kiểu int như trong DB
                             rate.setProductId(rs.getInt("product_id"));
                             return rate;
                         })

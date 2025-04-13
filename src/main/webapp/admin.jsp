@@ -2,6 +2,8 @@
 <%@ page import="utils.SessionUtil" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="service.impl.UserServiceImpl" %>
+<%@ page import="model.User" %>
 <%
     if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRole_idStr().equals("0")){
         response.sendRedirect("dangnhap.jsp");

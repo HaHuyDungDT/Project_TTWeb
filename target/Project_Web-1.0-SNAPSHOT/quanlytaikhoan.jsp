@@ -314,7 +314,7 @@
                         </div>
                         <div class="form-group">
                             <label>Ngày sinh</label>
-                            <input type="date" class="form-control" required name="date" id="addDate">
+                            <input type="date" class="form-control" required name="birth" id="addDate">
                         </div>
                         <div class="form-group">
                             <label>Giới tính</label>
@@ -349,7 +349,7 @@
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
-                        <input type="button" id="btnAdd" class="btn btn-success" value="Thêm">
+                        <input type="submit" id="btnAdd" class="btn btn-success" value="Thêm">
                     </div>
                 </form>
             </div>

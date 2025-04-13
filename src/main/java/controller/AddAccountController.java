@@ -10,6 +10,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import javax.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,6 +68,7 @@ public class AddAccountController extends HttpServlet {
             }
             user.setGender(req.getParameter("gender")); // Lấy giới tính
             user.setAddress(req.getParameter("address")); // Lấy địa chỉ
+//            user.setCreatedAt(LocalDateTime.now());
             user.setRoleId(Integer.parseInt(req.getParameter("role"))); // Giả sử "role" là ID của role
             user.setStatus(1); // Trạng thái mặc định là kích hoạt
             // Kiểm tra sự tồn tại của email và username
@@ -76,11 +79,12 @@ public class AddAccountController extends HttpServlet {
             }
             // Thêm người dùng vào cơ sở dữ liệu
             userService.add(user, req.getParameter("role"));
-            resp.sendRedirect("/quanlytaikhoan");
+            resp.sendRedirect("");
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
-
 }
+
+

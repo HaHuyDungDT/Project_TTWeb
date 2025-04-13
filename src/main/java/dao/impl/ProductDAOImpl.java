@@ -13,8 +13,21 @@ public class ProductDAOImpl implements IProductDAO {
 
     @Override
     public boolean addProduct(Product product) {
-
-        return false;
+        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createUpdate("INSERT INTO products (name, price, product_type_id, producer_id, quantity, status, import_date, coupon_id, detail, active) " +
+                                "VALUES (:name, :price, :productTypeId, :producerId, :quantity, :status, :importDate, :couponId, :detail, 1)")
+                        .bind("name", product.getName())
+                        .bind("price", product.getPrice())
+                        .bind("productTypeId", product.getProductTypeID())
+                        .bind("producerId", product.getProducerID())
+                        .bind("quantity", product.getQuantity())
+                        .bind("status", product.getStatus())
+                        .bind("importDate", product.getImport_date())
+                        .bind("couponId", product.getCouponId())
+                        .bind("detail", product.getDetail())
+                        .execute()
+        );
+        return rowsAffected > 0;
     }
 
     @Override

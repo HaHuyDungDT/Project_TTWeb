@@ -19,4 +19,6 @@ public interface IProductService {
     List<Product> findBestSeller();
     List<Product> findProductInStock();
     boolean updateProduct(Product product);
+
+    boolean insert(Product product);
 }

@@ -57,7 +57,7 @@
     <c:if test="${error != null}">
         <p class="alert alert-danger" id="errorMessage">${error}</p>
     </c:if>
-    <form action="login" method="post">
+    <form action="login" method ="post">
         <input type="text" placeholder="Tên đăng nhập" name="username" required value="${username}">
         <input type="password" placeholder="Mật khẩu" name="password" required value="${password}">
         <div class="recover">

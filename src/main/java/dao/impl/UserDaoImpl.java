@@ -21,7 +21,7 @@
                 try {
                     int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
                         // Câu truy vấn theo cấu trúc trong bảng users:
-                        return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                        return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email,phone,birth, gender, address, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                                 .bind(0, user.getUsername())
                                 .bind(1, user.getPassword())
                                 .bind(2, user.getOauthProvider())  // Có thể null
@@ -50,10 +50,10 @@
             public boolean isUserNameExists(String username) {
                 try {
                     int count = JDBIConnector.getConnect().withHandle(handle ->
-                            handle.createQuery("SELECT COUNT(*) FROM users WHERE username = :username")
-                                    .bind("username", username)
-                                    .mapTo(Integer.class)
-                                    .one()
+                        handle.createQuery("SELECT COUNT(*) FROM users WHERE username = :username")
+                                .bind("username", username)
+                                .mapTo(Integer.class)
+                                .one()
                     );
                     return count > 0;
                 } catch (Exception e) {
@@ -71,12 +71,12 @@
             public User getUserByUserName(String username) {
                 try {
                     return JDBIConnector.getConnect().withHandle(handle -> {
-                        return handle.createQuery(SELECT_USER + " WHERE username = :username")
+                         return handle.createQuery(SELECT_USER + " WHERE username = :username")
                                 .bind("username", username)
                                 .mapToBean(User.class)
                                 .findFirst()
                                 .orElse(null);
-                    });
+                });
                 } catch (Exception e) {
                     e.printStackTrace(); // In lỗi để debug
                     return null; // Trả về null nếu có lỗi

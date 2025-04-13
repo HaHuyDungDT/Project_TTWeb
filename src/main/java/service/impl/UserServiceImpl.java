@@ -116,12 +116,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void add(User user, String role) {
-        if(userDao.isEmailExists(user.getEmail()) || userDao.isUserNameExists(user.getUsername())) {
-            throw new RuntimeException("Email hoặc Username đã tồn tại");
-        }
+//        if(userDao.isEmailExists(user.getEmail()) || userDao.isUserNameExists(user.getUsername())) {
+//            throw new RuntimeException("Email hoặc Username đã tồn tại");
+//        }
         // Băm mật khẩu trước khi lưu
-        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        user.setPassword(hashedPassword);
+//        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+//        user.setPassword(hashedPassword);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         user.setStatus(1); // Mặc định kích hoạt

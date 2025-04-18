@@ -95,7 +95,12 @@ body {
 	color: var(--second-color);
 	position: relative;
 }
-
+.content h2.mb-0 {
+	font-size: 2rem;  /* Tăng kích thước */
+	color: #212121;   /* Đảm bảo màu chữ tương phản */
+	font-weight: bold;
+	text-shadow: 0 0 2px #fff;  /* Thêm đổ bóng để tăng độ rõ nét nếu cần */
+}
 .nav-link:hover {
 	cursor: pointer;
 }

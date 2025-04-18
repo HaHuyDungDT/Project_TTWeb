@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,4 +20,6 @@ public class Order {
     private LocalDateTime orderDate;
     private LocalDateTime deliveryDate;
     private Double totalPrice;
+    // Thêm thông tin coupon. Nếu có model Coupon thì dùng kiểu Coupon, nếu không thì có thể dùng Integer couponId
+    private Coupon coupon;
 }

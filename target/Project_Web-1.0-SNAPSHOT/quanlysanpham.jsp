@@ -1,12 +1,23 @@
-<%@ page import="Model.Product" %>
-<%@ page import="DAO.ProductDAO" %>
+<%@ page import="model.Product" %>
+<%@ page import="dao.impl.ProductDAOImpl" %>
 <%@ page import="java.util.List" %>
-<%@ page import="DAO.ProductTypeDAO" %>
-<%@ page import="DAO.ProducerDAO" %>
+<%@ page import="dao.impl.ProductTypeDAOImpl" %>
+<%@ page import="dao.impl.ProductDAOImpl" %>
 <%@ page import="java.util.Objects" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.impl.UserDaoImpl" %>
+<%
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
+    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -31,9 +42,9 @@
 
     <link rel="stylesheet" type="text/css" href="css/styleAdmin.css">
 
-    <jsp:useBean id="a" class="DAO.ProductDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="b" class="DAO.ProducerDAO" scope="request"></jsp:useBean>
-    <jsp:useBean id="c" class="DAO.ProductTypeDAO" scope="request"></jsp:useBean>
+    <jsp:useBean id="a" class="dao.impl.ProductDAOImpl" scope="request"></jsp:useBean>
+    <jsp:useBean id="b" class="dao.impl.ProductDAOImpl" scope="request"></jsp:useBean>
+    <jsp:useBean id="c" class="dao.impl.ProductTypeDAOImpl" scope="request"></jsp:useBean>
 </head>
 <body class="overlay-scrollbar">
 <!-- navbar -->
@@ -190,8 +201,8 @@
                         </thead>
                         <tbody>
                         <%
-                            ProductDAO productDAO = new ProductDAO();
-                            List<Product> listProduct = productDAO.getAll();
+                            ProductDAOImpl productDAO = new ProductDAOImpl();
+                            List<Product> listProduct = productDAO.findAll();
                             request.setAttribute("listAll", listProduct);
                             for (Product p : listProduct) {
                         %>
@@ -214,7 +225,7 @@
                             <td><%=p.getProducer().getId()%>
                             </td>
                             <td>
-                                <img style="width: 70px; height: 70px" src="<%=p.getImg()%>" alt="">
+                                <img style="width: 70px; height: 70px" src="<%=p.getImages()%>" alt="">
                             </td>
                             <td>
                                 <a href="#editEmployeeModal" class="edit" data-toggle="modal" data-product-id="<%=p.getId()%>">

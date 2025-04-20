@@ -1,10 +1,23 @@
 
-<%@ page import="Model.Order" %>
+<%@ page import="model.Order" %>
 <%@ page import="java.util.List" %>
-<%@ page import="Model.User" %>
-<%@ page import="DAO.UserDAO" %>
-<%@ page import="DAO.OrderDAO" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.impl.UserDaoImpl" %>
+<%@ page import="dao.impl.OrderDAOImpl" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.impl.UserDaoImpl" %>
+<%@ page import="dao.IOrderDAO" %>
+<%@ page import="service.impl.UserServiceImpl" %>
+<%
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
+    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -50,7 +63,7 @@
         <li class="nav-item">
             <div class="avt dropdown">
                 <c:if test="${sessionScope.user != null}">
-                    <a><i class="fa fa-user-o"></i> <%= new userServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
+<%--                    <a><i class="fa fa-user-o"></i> <%= new userServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>--%>
                 </c:if>
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
@@ -151,8 +164,8 @@
                         </thead>
                         <tbody>
                         <%
-                            OrderDAO orderDAO = new OrderDAO();
-                            List<Order> list = orderDAO.selectAll();
+                            IOrderDAO orderDAO = new OrderDAOImpl();
+                            List<Order> list = orderDAO.findAll();
                             for (Order order : list) {
                         %>
                         <tr>
@@ -164,7 +177,7 @@
                             </td>
                             <td><%=order.getStatus()%>
                             </td>
-                            <td><%=order.getPayMent()%>
+                            <td><%=order.getPayment_method()%>
                             </td>
                             <td><%=order.getOrderDate()%>
                             </td>
@@ -201,7 +214,7 @@
                             <label>Mã khách hàng</label>
                             <select name="userId" class="form-control" required>
                                 <option value="" disabled selected>Chọn mã khách hàng</option>
-                                <% List<User> u1 = new UserDAO().selectAll();
+                                <% List<User> u1 = new UserServiceImpl().findAll();
                                     for (User user : u1) {%>
                                 <option value="<%= user.getId() %>"><%= user.getId() %></option>
                                 <%
@@ -266,7 +279,7 @@
                             <label>Mã khách hàng</label>
                                 <select name="userId" class="form-control" required>
                                     <option value="" disabled selected>Chọn mã khách hàng</option>
-                                <% List<User> u = new UserDAO().selectAll();
+                                <% List<User> u = new UserDaoImpl().findAll();
                                     for (User user : u) {%>
                                     <option value="<%= user.getId() %>"><%= user.getId() %></option>
                                 <%

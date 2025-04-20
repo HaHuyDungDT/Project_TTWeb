@@ -7,10 +7,13 @@ import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 import service.IUserService;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public class UserServiceImpl implements IUserService {
+    private IUserDao userDao = new UserDaoImpl(); // tách ra thành field (không tạo mỗi lần)
 
     @Override
     public boolean login(String username, String password) {
@@ -61,8 +64,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User getById(Integer id) {
-        // TODO: triển khai
-        return null;
+        return userDao.getUserByUserId(id);
     }
 
     @Override
@@ -93,36 +95,73 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        String sql = "SELECT id, username, password, oauth_provider, oauth_uid, oauth_token, name, email, role_id, created_at, updated_at, status, phone, birth, gender, address FROM users WHERE status = 1";
+
+        return JDBIConnector.getConnect().withHandle(handle -> {
+            // Tạo danh sách user bằng ánh xạ thủ công
+            return handle.createQuery(sql)
+                    .map((rs, ctx) -> {
+                        // Ánh xạ thủ công từng trường vào đối tượng User
+                        User user = new User();
+                        user.setId(rs.getInt("id"));
+                        user.setUsername(rs.getString("username"));
+                        user.setPassword(rs.getString("password"));
+                        user.setOauthProvider(rs.getString("oauth_provider"));
+                        user.setOauthUid(rs.getString("oauth_uid"));
+                        user.setOauthToken(rs.getString("oauth_token"));
+                        user.setName(rs.getString("name"));
+                        user.setEmail(rs.getString("email"));
+                        user.setRoleId(rs.getInt("role_id"));
+                        user.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                        user.setUpdatedAt(rs.getObject("updated_at", LocalDateTime.class));
+                        user.setStatus(rs.getInt("status"));
+                        user.setPhone(rs.getString("phone"));
+                        user.setBirth(rs.getObject("birth", LocalDate.class));
+                        user.setGender(rs.getString("gender"));
+                        user.setAddress(rs.getString("address"));
+                        // Các trường chưa triển khai
+                        user.setSecretKey(null);  // Ánh xạ thủ công giá trị mặc định là null
+                        user.setTwoFaEnabled(false);  // Giá trị mặc định là false
+                        user.setPicture(null);  // Giá trị mặc định là null
+                        return user;
+                    })
+                    .list();
+        });
     }
 
     @Override
     public void deleteById(Integer id) {
-        // TODO: triển khai nếu cần
+        userDao.deleteById(id);
     }
 
     @Override
     public boolean update(User user) {
-        try {
-            int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-                return handle.createUpdate("UPDATE users SET password = ?, updated_at = ?, secret_key = ?, twoFaEnabled = ? WHERE id = ?")
-                        .bind(0, user.getPassword())
-                        .bind(1, java.sql.Timestamp.valueOf(user.getUpdatedAt()))
-                        .bind(2, user.getSecretKey())
-                        .bind(3, user.isTwoFaEnabled())
-                        .bind(4, user.getId())
-                        .execute();
-            });
-            return rowsAffected > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+//        try {
+//            int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
+//                return handle.createUpdate("UPDATE users SET password = ?, updated_at = ?, secret_key = ?, twoFaEnabled = ? WHERE id = ?")
+//                        .bind(0, user.getPassword())
+//                        .bind(1, java.sql.Timestamp.valueOf(user.getUpdatedAt()))
+//                        .bind(2, user.getSecretKey())
+//                        .bind(3, user.isTwoFaEnabled())
+//                        .bind(4, user.getId())
+//                        .execute();
+//            });
+//            return rowsAffected > 0;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+        return userDao.update(user);
     }
 
     @Override
-    public void add(User user, String role) {
-        // TODO: triển khai nếu cần
+    public boolean add(User user) {
+
+
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPassword);
+        return userDao.register(user); // đơn giản hơn
+
     }
 
     @Override

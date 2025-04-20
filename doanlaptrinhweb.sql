@@ -22,15 +22,15 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `cart_items`;
 CREATE TABLE `cart_items`  (
-  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `cart_id` int NOT NULL,
-  `product_id` int NOT NULL,
-  `quantity` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `cart_items_carts_id_fk`(`cart_id` ASC) USING BTREE,
-  INDEX `cart_items_products_id_fk`(`product_id` ASC) USING BTREE,
-  CONSTRAINT `cart_items_carts_id_fk` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `cart_items_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                               `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                               `cart_id` int NOT NULL,
+                               `product_id` int NOT NULL,
+                               `quantity` int NOT NULL,
+                               PRIMARY KEY (`id`) USING BTREE,
+                               INDEX `cart_items_carts_id_fk`(`cart_id` ASC) USING BTREE,
+                               INDEX `cart_items_products_id_fk`(`product_id` ASC) USING BTREE,
+                               CONSTRAINT `cart_items_carts_id_fk` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                               CONSTRAINT `cart_items_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -42,11 +42,11 @@ CREATE TABLE `cart_items`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `carts`;
 CREATE TABLE `carts`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `carts_users_id_fk`(`user_id` ASC) USING BTREE,
-  CONSTRAINT `carts_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                          `id` int NOT NULL AUTO_INCREMENT,
+                          `user_id` int NOT NULL,
+                          PRIMARY KEY (`id`) USING BTREE,
+                          INDEX `carts_users_id_fk`(`user_id` ASC) USING BTREE,
+                          CONSTRAINT `carts_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -58,12 +58,12 @@ CREATE TABLE `carts`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `coupon`;
 CREATE TABLE `coupon`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `percent_discount` int NOT NULL,
-  `date_start` datetime NOT NULL,
-  `date_end` datetime NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `percent_discount` int NOT NULL,
+                           `date_start` datetime NOT NULL,
+                           `date_end` datetime NOT NULL,
+                           PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -81,12 +81,12 @@ INSERT INTO `coupon` VALUES (6, 'PAOPLUNG50', 50, '2024-06-16 20:54:04', '2024-0
 -- ----------------------------
 DROP TABLE IF EXISTS `images`;
 CREATE TABLE `images`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `link_image` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `product_id` int NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `images_products_id_fk`(`product_id` ASC) USING BTREE,
-  CONSTRAINT `images_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `link_image` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `product_id` int NULL DEFAULT NULL,
+                           PRIMARY KEY (`id`) USING BTREE,
+                           INDEX `images_products_id_fk`(`product_id` ASC) USING BTREE,
+                           CONSTRAINT `images_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -247,12 +247,12 @@ INSERT INTO `images` VALUES (149, './img/Sony/Loa/Loa Bluetooth Sony SRS-XB13.jp
 -- ----------------------------
 DROP TABLE IF EXISTS `inventory`;
 CREATE TABLE `inventory`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `product_id` int NULL DEFAULT NULL,
-  `quantity` int NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `product_id`(`product_id` ASC) USING BTREE,
-  CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `product_id` int NULL DEFAULT NULL,
+                              `quantity` int NULL DEFAULT NULL,
+                              PRIMARY KEY (`id`) USING BTREE,
+                              INDEX `product_id`(`product_id` ASC) USING BTREE,
+                              CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -413,13 +413,13 @@ INSERT INTO `inventory` VALUES (149, 150, 500);
 -- ----------------------------
 DROP TABLE IF EXISTS `logs`;
 CREATE TABLE `logs`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `level` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `action` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `address_ip` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `user_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` datetime NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                         `id` int NOT NULL AUTO_INCREMENT,
+                         `level` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                         `action` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                         `address_ip` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                         `user_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                         `created_at` datetime NOT NULL,
+                         PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 458 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -431,14 +431,14 @@ CREATE TABLE `logs`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `order_details`;
 CREATE TABLE `order_details`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `order_id` int NOT NULL,
-  `amount` double NOT NULL,
-  `product_id` int NOT NULL,
-  `quantity` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `order_details_products_id_fk`(`product_id` ASC) USING BTREE,
-  CONSTRAINT `order_details_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                                  `id` int NOT NULL AUTO_INCREMENT,
+                                  `order_id` int NOT NULL,
+                                  `amount` double NOT NULL,
+                                  `product_id` int NOT NULL,
+                                  `quantity` int NOT NULL,
+                                  PRIMARY KEY (`id`) USING BTREE,
+                                  INDEX `order_details_products_id_fk`(`product_id` ASC) USING BTREE,
+                                  CONSTRAINT `order_details_products_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -450,19 +450,19 @@ CREATE TABLE `order_details`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `payment_method` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `order_date` datetime NOT NULL,
-  `delivery_date` datetime NOT NULL,
-  `total_price` double NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `orders_users_id_fk`(`user_id` ASC) USING BTREE,
-  CONSTRAINT `orders_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `user_id` int NOT NULL,
+                           `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
+                           `payment_method` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                           `order_date` datetime NOT NULL,
+                           `delivery_date` datetime NOT NULL,
+                           `total_price` double NULL DEFAULT NULL,
+                           PRIMARY KEY (`id`) USING BTREE,
+                           INDEX `orders_users_id_fk`(`user_id` ASC) USING BTREE,
+                           CONSTRAINT `orders_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -474,10 +474,10 @@ CREATE TABLE `orders`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `producers`;
 CREATE TABLE `producers`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                              `code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                              PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -497,10 +497,10 @@ INSERT INTO `producers` VALUES (8, 'Xiaomi', 'XI');
 -- ----------------------------
 DROP TABLE IF EXISTS `product_types`;
 CREATE TABLE `product_types`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                                  `id` int NOT NULL AUTO_INCREMENT,
+                                  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                                  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                                  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -516,24 +516,24 @@ INSERT INTO `product_types` VALUES (4, 'Phụ kiện khác', 'OTHER');
 -- ----------------------------
 DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `price` double NOT NULL,
-  `product_type_id` int NOT NULL,
-  `producer_id` int NOT NULL,
-  `quantity` int NOT NULL,
-  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
-  `coupon_id` int NOT NULL,
-  `detail` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `import_date` date NULL DEFAULT NULL,
-  `active` int NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `product_producers_id_fk`(`producer_id` ASC) USING BTREE,
-  INDEX `product_product_types_id_fk`(`product_type_id` ASC) USING BTREE,
-  INDEX `products_coupon_id_fk`(`coupon_id` ASC) USING BTREE,
-  CONSTRAINT `product_producers_id_fk` FOREIGN KEY (`producer_id`) REFERENCES `producers` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `product_product_types_id_fk` FOREIGN KEY (`product_type_id`) REFERENCES `product_types` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `products_coupon_id_fk` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                             `id` int NOT NULL AUTO_INCREMENT,
+                             `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                             `price` double NOT NULL,
+                             `product_type_id` int NOT NULL,
+                             `producer_id` int NOT NULL,
+                             `quantity` int NOT NULL,
+                             `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                             `coupon_id` int NOT NULL,
+                             `detail` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                             `import_date` date NULL DEFAULT NULL,
+                             `active` int NOT NULL DEFAULT 1,
+                             PRIMARY KEY (`id`) USING BTREE,
+                             INDEX `product_producers_id_fk`(`producer_id` ASC) USING BTREE,
+                             INDEX `product_product_types_id_fk`(`product_type_id` ASC) USING BTREE,
+                             INDEX `products_coupon_id_fk`(`coupon_id` ASC) USING BTREE,
+                             CONSTRAINT `product_producers_id_fk` FOREIGN KEY (`producer_id`) REFERENCES `producers` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                             CONSTRAINT `product_product_types_id_fk` FOREIGN KEY (`product_type_id`) REFERENCES `product_types` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                             CONSTRAINT `products_coupon_id_fk` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 151 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -694,13 +694,13 @@ INSERT INTO `products` VALUES (150, 'Cáp Type C - Lightning', 250000, 1, 7, 0, 
 -- ----------------------------
 DROP TABLE IF EXISTS `rates`;
 CREATE TABLE `rates`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `star` int NULL DEFAULT NULL,
-  `comment` int NULL DEFAULT NULL,
-  `product_id` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `rates_product_id_fk`(`product_id` ASC) USING BTREE,
-  CONSTRAINT `rates_product_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+                          `id` int NOT NULL AUTO_INCREMENT,
+                          `star` int NULL DEFAULT NULL,
+                          `comment` int NULL DEFAULT NULL,
+                          `product_id` int NOT NULL,
+                          PRIMARY KEY (`id`) USING BTREE,
+                          INDEX `rates_product_id_fk`(`product_id` ASC) USING BTREE,
+                          CONSTRAINT `rates_product_id_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -712,9 +712,9 @@ CREATE TABLE `rates`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                          `id` int NOT NULL AUTO_INCREMENT,
+                          `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                          PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -729,29 +729,28 @@ INSERT INTO `roles` VALUES (4, 'USER');
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `oauth_provider` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
-  `oauth_uid` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `oauth_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `birth` date NULL,
-  `gender` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL,
-  `role_id` int NOT NULL,
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `status` int NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `users_roles_id_fk`(`role_id` ASC) USING BTREE,
-  CONSTRAINT `users_roles_id_fk` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of users
--- ----------------------------
+                          `id` int(11) NOT NULL AUTO_INCREMENT,
+                          `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                          `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                          `oauth_provider` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `oauth_uid` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `oauth_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                          `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
+                          `role_id` int(11) NOT NULL,
+                          `created_at` datetime NOT NULL,
+                          `updated_at` datetime NOT NULL,
+                          `status` int(11) NOT NULL,
+                          `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `birth` date NULL DEFAULT NULL,
+                          `gender` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `secretKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          `twoFaEnabled` tinyint(1) NULL DEFAULT 0,
+                          `picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NULL DEFAULT NULL,
+                          PRIMARY KEY (`id`) USING BTREE,
+                          INDEX `users_roles_id_fk`(`role_id`) USING BTREE,
+                          CONSTRAINT `users_roles_id_fk` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 61 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_vietnamese_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -15,7 +15,7 @@ public interface IUserService {
     List<User> findAll();
     void deleteById(Integer id); // đổi sang Integer cho thống nhất
     boolean update(User user);
-    void add(User user, String role);
+    boolean add(User user);
     boolean addGoogleUser(User newUser);
     User getByOAuthUser(String id);
     String createId(); // Có thể bỏ nếu bạn đã dùng auto_increment

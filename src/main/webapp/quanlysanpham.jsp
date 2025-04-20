@@ -7,7 +7,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.impl.UserDaoImpl" %>
+<%
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
+    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -320,7 +330,7 @@
     <div id="addEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="add" method="post">
+                <form action="account-add" method="post">
                     <div class="modal-header">
                         <h4 class="modal-title">Thêm sản phẩm</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

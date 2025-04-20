@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Java
+target/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# System
+.DS_Store
+Thumbs.db

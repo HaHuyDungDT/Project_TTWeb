@@ -1,9 +1,3 @@
-<%@ page import="java.util.Map" %>
-<%@ page import="Model.Product" %>
-<%@ page import="java.util.List" %>
-<%@ page import="Cart.CartProduct" %>
-<%@ page import="Cart.Cart" %>
-<%@ page import="java.util.HashMap" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
@@ -13,48 +7,30 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Phù hợp mọi loại màn hình -->
-
-
     <title>Thanh toán</title>
-
-    <!-- Google font -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
-
-    <!-- Bootstrap -->
     <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css"/>
-
-    <!-- Slick -->
     <link type="text/css" rel="stylesheet" href="css/slick.css"/>
     <link type="text/css" rel="stylesheet" href="css/slick-theme.css"/>
-
-
     <link type="text/css" rel="stylesheet" href="css/nouislider.min.css"/>
-
-    <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
-
-    <!-- stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
-
-
-    <jsp:useBean id="a" class="DAO.OrderDetailsDAO" scope="request"/>
-    <jsp:useBean id="b" class="DAO.OrderDAO" scope="request"/>
+    <link rel="icon" href="./img/logo.png" type="image/x-icon"/>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/slick.min.js"></script>
+    <script src="js/nouislider.min.js"></script>
+    <script src="js/jquery.zoom.min.js"></script>
+    <jsp:useBean id="a" class="dao.impl.OrderDetailDAOImpl" scope="request"/>
+    <jsp:useBean id="b" class="dao.impl.CouponImpl" scope="request"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
-
-<!-- HEADER -->
 <jsp:include page="header.jsp"/>
-<!-- /HEADER -->
-
-<!-- MENU -->
 <jsp:include page="menu.jsp"/>
-<!-- /MENU -->
-
-<!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
-    <!-- container -->
     <div class="container">
-        <!-- row -->
         <div class="row">
             <div class="col-md-12">
                 <ul class="breadcrumb-tree">
@@ -63,61 +39,60 @@
                 </ul>
             </div>
         </div>
-        <!-- /row -->
     </div>
-    <!-- /container -->
 </div>
-<!-- /BREADCRUMB -->
-
-<!-- SECTION -->
 <div class="section">
-    <!-- container -->
     <div class="container">
-        <!-- row -->
         <div class="row">
-            <form id="orderForm" action="./order" method="post">
+            <form id="orderForm" action="order" method="post" onsubmit="updateAddress()">
                 <div class="col-md-7">
                     <c:if test="${error != null}">
                         <p class="alert alert-danger">${error}</p>
                     </c:if>
-                    <!-- Billing Details -->
                     <div class="billing-details">
                         <div class="section-title">
                             <h3 class="title">Thông tin thanh toán</h3>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="text" name="name" placeholder="Họ và tên" required value="${name}">
+                            <input class="input" type="text" name="name" placeholder="Họ và tên" required
+                                   value="${name}">
                         </div>
                         <div class="form-group">
-                            <input class="input" type="email" name="email" placeholder="Email" required value="${email}">
+                            <input class="input" type="email" name="email" placeholder="Email" required
+                                   value="${email}">
+                        </div>
+                        <div class="container-address col-12"
+                             style="display: flex; flex-direction: row; justify-content: space-between">
+                            <div class="form-group col-3">
+                                <select class="form-select form-control" id="province-select" name="province">
+                                    <option value="">--Chọn Tỉnh Thành--</option>
+                                </select>
+                            </div>
+                            <div class="form-group  col-3">
+                                <select class="form-select form-control" id="district-select" name="district">
+                                    <option value="">--Chọn Quận Huyện--</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <select class="form-select form-control" id="ward-select" name="ward">
+                                    <option value="">--Chọn Phường Xã--</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="text" name="delivery_address" placeholder="Địa chỉ nhận hàng" required>
+                            <input class="input" type="tel" name="phone_number" placeholder="Số điện thoại" required
+                                   value="${phone_number}">
                         </div>
-                        <div class="form-group">
-                            <input class="input" type="tel" name="phone_number" placeholder="Số điện thoại" required value="${phone_number}">
-                        </div>
-
                     </div>
-                    <!-- /Billing Details -->
-
-                    <!-- Shiping Details -->
                     <div class="shiping-details">
                         <div class="section-title">
                             <h3 class="title">Yêu cầu khác</h3>
                         </div>
-
                     </div>
-                    <!-- /Shiping Details -->
-
-                    <!-- Order notes -->
                     <div class="order-notes">
-                        <textarea class="input" placeholder="Yêu cầu khác(Không bắt buộc)"></textarea>
+                        <textarea name="note" class="input" placeholder="Yêu cầu khác(Không bắt buộc)"></textarea>
                     </div>
-                    <!-- /Order notes -->
                 </div>
-
-                <!-- Order Details -->
                 <div class="col-md-5 order-details">
                     <div class="section-title text-center">
                         <h3 class="title">Đơn hàng của bạn</h3>
@@ -127,43 +102,56 @@
                             <div><strong>SẢN PHẨM</strong></div>
                             <div><strong>GIÁ</strong></div>
                         </div>
-                        <% Cart cart = (Cart) session.getAttribute("cart");
-                            List<CartProduct> cartProducts = cart != null ? cart.getCartProducts() : null;
-                            double totalAmout = 0;
-                            if (cart != null) {
-                                for (CartProduct cartProduct : cartProducts) {
-                                    totalAmout += cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
-                        %>
+                        <c:set var="totalPrice" value="0"/>
                         <div class="order-products">
-                            <div class="order-col">
-                                <div><%= cartProduct.getQuantity() %>X</div>
-                                <div><%= cartProduct.getProduct().getName() %>
+                            <c:forEach var="item" items="${selectedProductsList}" >
+                                <div class="order-col" data-product-id="${item.product.id}" data-selected="true">
+                                    <div>${item['quantity']} X</div>
+                                    <div>${item.product.name}</div>
+                                    <div>
+                                        <fmt:formatNumber value="${item.product.price}" type="number" pattern="#,##0" var="formattedPrice"/>
+                                        <h5 class="product-price"
+                                            data-product-id="${item.product.id}"
+                                            data-original-price="${item.product.price}"
+                                            data-coupon-id="${item.product.couponId}">${formattedPrice} VNĐ</h5>
+                                    </div>
                                 </div>
+                                <c:set var="totalPrice" value="${totalPrice + (item.product.price * item.quantity)}"/>
+                            </c:forEach>
+                        </div>
+                        <c:if test="${not empty sessionScope.coupons}">
+                            <div class="order-col">
+                                <div>Chọn mã giảm giá</div>
                                 <div>
-                                    <fmt:formatNumber value="<%=cartProduct.getProduct().getPrice()%>" type="number"
-                                                      pattern="#,##0"
-                                                      var="formattedPrice"/>
-                                    <h5 class="product-price">${formattedPrice} VNĐ</h5>
+                                    <select name="selectedCouponId" id="couponSelect" onchange="calculateDiscount()">
+                                        <c:forEach var="coupon" items="${sessionScope.coupons}">
+                                            <option value="${coupon.id}" data-discount="${coupon.percent_discount}">
+                                                    ${coupon.code} - ${coupon.percent_discount}%
+                                            </option>
+                                        </c:forEach>
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                        <% }%>
+                        </c:if>
                         <div class="order-col">
                             <div>Phí vận chuyển</div>
-                            <div><strong>Miễn Phí</strong></div>
+                            <div id="fee-delivery">
+                                <strong class="order-total">
+                                    <h5 class="product-price total" id="formattedPrice">0 VNĐ</h5>
+                                </strong>
+                            </div>
                         </div>
                         <div class="order-col">
                             <div><strong>TỔNG TIỀN</strong></div>
                             <div>
-                                <strong class="order-total"><fmt:formatNumber value="<%=totalAmout%>" type="number"
-                                                                              pattern="#,##0"
-                                                                              var="formattedPrice"/>
-                                    <h5 class="product-price">${formattedPrice} VNĐ</h5></strong>
+                                <strong class="order-total">
+                                    <fmt:formatNumber value="${totalPrice}" type="number" pattern="#,##0"
+                                                      var="formattedPrice"/>
+                                    <h5 id="product-price" class="product-price total">${formattedPrice} VNĐ</h5>
+                                </strong>
                             </div>
                         </div>
                     </div>
-                    <% } else {
-                    }%>
                     <h5>HÌNH THỨC THANH TOÁN</h5>
                     <div class="payment-method">
                         <div class="input-radio">
@@ -173,9 +161,9 @@
                                 Chuyển khoản trực tiếp
                             </label>
                             <div class="caption">
-                                <p>Quý khách vui lòng chuyển khoản qua số tài khoản: 0973206403 với nội dung là : Số
-                                    điện
-                                    thoại + Họ và tên</p>
+                                <p>Quý khách vui lòng quét mã để chuyển khoản với nội dung: Họ tên người mua + số điện
+                                    thoại</p>
+                                <img id="qr_code" alt="qr_code" src="" style="width: 200px; height: 200px"/>
                             </div>
                         </div>
                         <div class="input-radio">
@@ -197,17 +185,17 @@
                             <span></span>
                             Tôi đã đọc và chấp nhận <a href="chinhsachbaomat.jsp">các điều khoản trên</a>
                         </label>
-                        <button onclick="validateForm()" data-toggle="modal" class="primary-btn order-submit">Đặt hàng</button>
+                        <input type="hidden" id="selectedProvince" name="selectedProvince">
+                        <input type="hidden" id="selectedDistrict" name="selectedDistrict">
+                        <input type="hidden" id="selectedWard" name="selectedWard">
+                        <input type="hidden" id="hiddenTotalPrice" name="totalPrice" value="${totalPrice}" />
+                        <button onclick="validateForm()" data-toggle="modal" class="primary-btn order-submit">Đặt hàng
+                        </button>
                     </div>
-                    <!-- /Order Details -->
                 </div>
             </form>
-            <!-- /row -->
         </div>
-        <!-- /container -->
     </div>
-
-    <!-- Order-->
     <div id="oderEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -215,46 +203,66 @@
                     <h4 class="modal-title">Bạn đã đặt hàng thành công</h4>
                 </div>
                 <div class="modal-footer">
-                    <button id="confirmOrderBtn" onclick="confirmOrder()" type="button" class="btn btn-danger">Xác nhận</button>
+                    <button id="confirmOrderBtn" onclick="confirmOrder()" type="button" class="btn btn-danger">Xác
+                        nhận
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <!--/ Order-->
-
-    <!-- /SECTION -->
 </div>
-<!-- FOOTER -->
 <jsp:include page="footer.jsp"/>
-<!-- /FOOTER -->
-
-<!-- jQuery Plugins -->
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/slick.min.js"></script>
-<script src="js/nouislider.min.js"></script>
-<script src="js/jquery.zoom.min.js"></script>
 <script src="js/main.js"></script>
-
 <script>
+    $("#payment-1").change(() => {
+        var productPriceText = $('.product-price.total').text();
+        productPriceText = productPriceText.replace(' VNĐ', '');
+        productPriceText = productPriceText.replace('.', '');
+        var price = parseInt(productPriceText);
+        payByVNPay(price);
+    });
+
     function validateForm() {
         var orderForm = document.getElementById('orderForm');
         var selectedPayment = document.querySelector('input[name="payment"]:checked');
         var checkbox = document.getElementById('terms');
         if (checkbox.checked && orderForm.checkValidity() && selectedPayment) {
             $('#oderEmployeeModal').modal('show');
+
         } else {
             alert("Vui lòng điền đầy đủ thông tin và đồng ý với các điều khoản.");
         }
     }
-
     function confirmOrder() {
         $('#oderEmployeeModal').modal('hide');
         window.location.href = 'index.jsp';
+    };
+    function payByVNPay(amount) {
+        $.ajax({
+            type: "POST",
+            url: "https://api.vietqr.io/v2/generate",
+            header: {
+                'x-client-id': 'c04356b0-1f95-4f7b-8032-f423154ad6d2',
+                'x-api-key': '459490ee-74af-4645-ad59-e47be0dd3f8e',
+                'Content-Type': 'application/json'
+            },
+            data: {
+                "accountNo": "31410004064069",
+                "accountName": "Hà Huy Dũng",
+                "acqId": "970418",
+                "addInfo": "Thanh Toán mua hàng",
+                "amount": amount,
+                "template": "compact"
+            },
+            success: function (response) {
+                $("#qr_code").attr("src", response.data.qrDataURL);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error sending payment method:", error);
+            }
+        });
     }
-
 </script>
-
 <script>
     $(document).ready(function () {
         <% Boolean OrderSuccess = (Boolean)request.getSession().getAttribute("OrderSuccess");%>
@@ -264,6 +272,85 @@
         <% } %>
     });
 </script>
+
+<script>
+    // Function to update selected values and submit form
+    function updateAddress() {
+        var provinceSelect = document.getElementById('province-select');
+        var districtSelect = document.getElementById('district-select');
+        var wardSelect = document.getElementById('ward-select');
+
+        var provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+        var districtName = districtSelect.options[districtSelect.selectedIndex].text;
+        var wardName = wardSelect.options[wardSelect.selectedIndex].text;
+
+        // Set the names to hidden fields or directly to form fields
+        document.getElementById('selectedProvince').value = provinceName;
+        document.getElementById('selectedDistrict').value = districtName;
+        document.getElementById('selectedWard').value = wardName;
+    }
+</script>
+<script>
+    var originalTotalPrice = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var totalPriceElement = document.getElementById('product-price');
+        originalTotalPrice = parseInt(totalPriceElement.textContent.replace(' VNĐ', '').replace(/,/g, '')) || 0;
+    });
+
+    function calculateDiscount() {
+        var selectElement = document.getElementById('couponSelect');
+        if (!selectElement) return;
+
+        var selectedCouponId = selectElement.value;
+        var discountPercent = parseFloat(selectElement.options[selectElement.selectedIndex].getAttribute('data-discount')) || 0;
+
+        var orderProducts = document.querySelectorAll('.order-products .order-col');
+
+        orderProducts.forEach(function(productRow) {
+            var productPriceElement = productRow.querySelector('.product-price');
+            var originalPrice = parseFloat(productPriceElement.getAttribute('data-original-price'));
+            var productCouponId = productPriceElement.getAttribute('data-coupon-id');
+
+            var discountedPrice = originalPrice;
+            if (productCouponId === selectedCouponId) {
+                discountedPrice = originalPrice * (1 - discountPercent / 100);
+            }
+
+            var formattedDiscountedPrice = discountedPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' VNĐ';
+            productPriceElement.textContent = formattedDiscountedPrice;
+        });
+
+        updateTotalAmount();
+    }
+
+    function updateTotalPrice(shippingFee) {
+        // Lấy tổng giá sản phẩm ban đầu
+        var totalPriceElement = document.getElementById('product-price');
+        var totalPriceText = totalPriceElement.textContent.replace(' VNĐ', '').replace(/\./g, '');
+        var totalPrice = parseInt(totalPriceText) || 0;
+
+        // Áp dụng giảm giá nếu có
+        var couponSelect = document.getElementById('couponSelect');
+        if (couponSelect) {
+            var discountPercent = parseFloat(couponSelect.options[couponSelect.selectedIndex].getAttribute('data-discount')) || 0;
+            totalPrice = totalPrice * (1 - discountPercent / 100);
+        }
+
+        // Cộng thêm phí vận chuyển
+        totalPrice += shippingFee;
+
+        // Định dạng lại số tiền
+        var formattedTotal = new Intl.NumberFormat('vi-VN').format(totalPrice) + ' VNĐ';
+
+        // Cập nhật lên giao diện
+        totalPriceElement.textContent = formattedTotal;
+
+        // Cập nhật vào hidden field để submit form
+        document.getElementById('hiddenTotalPrice').value = totalPrice;
+    }
+</script>
+
 
 </body>
 </html>

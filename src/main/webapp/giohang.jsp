@@ -100,7 +100,7 @@
                                         </button>
                                     </div>
                                     <input type="text" class="form-control bg-secondary text-center"
-                                           value="${item.quantity}">
+                                           name="quantity${item.product.id}" value="${item.quantity}">
                                     <div class="input-group-btn">
                                         <button type="button" class="btn btn-sm btn-primary btn-plus"
                                                 style="background: #5cb85c; border: none">
@@ -160,16 +160,30 @@
 </div>
 <jsp:include page="footer.jsp"/>
 <script>
-    $('.btn-minus').click(function () {
+    $('.btn-minus, .btn-plus, .quantity input').on('click change', function() {
         var input = $(this).closest('.input-group').find('input');
-        var newValue = parseInt(input.val()) - 1;
-        if (newValue >= 1) {
-            input.val(newValue);
-            var productId = $(this).closest('.cart-item').attr('id').split('-')[1];
-            updateQuantity(productId, newValue);
-        }
-    });
+        var newValue = parseInt(input.val());
 
+        if ($(this).hasClass('btn-minus') && newValue > 1) {
+            newValue--;
+        } else if ($(this).hasClass('btn-plus')) {
+            newValue++;
+        }
+
+        input.val(newValue);
+
+        var productId = $(this).closest('.cart-item').attr('id').split('-')[1];
+        var checkbox = $('#item-' + productId).find('.productCheckbox');
+
+        // Cập nhật số lượng trong data attribute của checkbox
+        checkbox.data('quantity', newValue);
+
+        // Gọi AJAX cập nhật số lượng trên server
+        updateQuantity(productId, newValue);
+
+        // Cập nhật tổng tiền
+        updateTotalAmount();
+    });
     $('.btn-plus').click(function () {
         var input = $(this).closest('.input-group').find('input');
         var newValue = parseInt(input.val()) + 1;
@@ -195,16 +209,23 @@
             productId: productId,
             quantity: quantity
         };
+
         $.ajax({
             url: '/update-quantity-cart-item',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
-            success: function (response) {
-                updateCartItem(productId, response.newPrice);
-                updateTotalAmount();
+            success: function(response) {
+                // Chỉ cập nhật giá của sản phẩm đó
+                var cartItem = $('#item-' + productId);
+                var totalElement = cartItem.find('.total-price');
+                var formattedPrice = new Intl.NumberFormat('vi-VN').format(response.newPrice);
+                totalElement.text(formattedPrice + ' VNĐ');
+
+                // Cập nhật giá trong data attribute của checkbox
+                cartItem.find('.productCheckbox').data('price', response.newPrice / quantity);
             },
-            error: function (xhr) {
+            error: function(xhr) {
                 Toastify({
                     text: 'Cập nhật thất bại',
                     duration: 3000,
@@ -215,8 +236,6 @@
                     stopOnFocus: true,
                     style: {
                         background: "#D10024",
-                    },
-                    onClick: function () {
                     }
                 }).showToast();
             }
@@ -235,19 +254,18 @@
     }
 
     function updateTotalAmount() {
-        $.ajax({
-            url: '/cart/total', // đường dẫn servlet/controller xử lý
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
-                // Format tiền theo kiểu Việt Nam
-                var formattedAmount = new Intl.NumberFormat('vi-VN').format(data.totalAmount);
-                $('#totalAmountLabel').html('<strong>Tổng tiền : ' + formattedAmount + '</strong>');
-            },
-            error: function () {
-                console.error("Không thể cập nhật tổng tiền.");
-            }
+        var total = 0;
+
+        // Lặp qua tất cả các checkbox được chọn
+        $('input.productCheckbox:checked').each(function() {
+            var price = parseFloat($(this).data('price'));
+            var quantity = parseInt($(this).data('quantity'));
+            total += price * quantity;
         });
+
+        // Format số tiền và cập nhật lên giao diện
+        var formattedAmount = new Intl.NumberFormat('vi-VN').format(total);
+        $('#totalAmountLabel').html('<strong>Tổng tiền : ' + formattedAmount + '</strong>');
     }
 
     // Gọi hàm khi số lượng thay đổi
@@ -281,9 +299,12 @@
         }
     });
 
-    $('#selectAll').on('change', function () {
+    $('#selectAll').on('change', function() {
         var isChecked = $(this).is(':checked');
-        $('input[name="selectedProductIds"]').prop('checked', isChecked);
+        $('input.productCheckbox').prop('checked', isChecked).trigger('change');
+    });
+
+    $('input.productCheckbox').on('change', function() {
         updateTotalAmount();
     });
 

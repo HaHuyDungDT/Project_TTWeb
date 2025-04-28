@@ -4,11 +4,12 @@ import dao.IUserDao;
 import db.JDBIConnector;
 import model.User;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
 public class UserDaoImpl implements IUserDao {
-    private static final String SELECT_USER = "SELECT id, username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status, secret_key, twoFaEnabled FROM users";
+    private static final String SELECT_USER = "SELECT id, username, password, oauth_provider, oauth_uid, oauth_token, name, email, role_id, created_at, updated_at, status, phone, birth, gender, address, secretKey, twoFaEnabled, picture FROM users";
     Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
     @Override
@@ -18,26 +19,38 @@ public class UserDaoImpl implements IUserDao {
 
     @Override
     public boolean register(User user) {
+        System.out.println("Đang insert user vào DB...");
+        System.out.println(user);
         try {
             int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-                return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+//                return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
+                return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, role_id, created_at, updated_at, status, phone, birth, gender, address, secretKey, twoFaEnabled, picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .bind(0, user.getUsername())
                         .bind(1, user.getPassword())
-                        .bind(2, user.getOauthProvider())  // Có thể null
-                        .bind(3, user.getOauthUid())       // Có thể null
-                        .bind(4, user.getOauthToken())     // Có thể null
+                        .bind(2, user.getOauthProvider())
+                        .bind(3, user.getOauthUid())
+                        .bind(4, user.getOauthToken())
                         .bind(5, user.getName())
                         .bind(6, user.getEmail())
-                        .bind(7, user.getPicture())  // Giá trị cho cột picture
-                        .bind(8, user.getRoleId())
-                        .bind(9, user.getCreatedAt())
-                        .bind(10, user.getUpdatedAt())
-                        .bind(11, user.getStatus())
+                        .bind(7, user.getRoleId())
+                        .bind(8, user.getCreatedAt())
+                        .bind(9, user.getUpdatedAt())
+                        .bind(10, user.getStatus())
+                        .bind(11, user.getPhone())
+                        .bind(12, user.getBirth())
+                        .bind(13, user.getGender())
+                        .bind(14, user.getAddress())
+                        .bind(15, user.getSecretKey())
+                        .bind(16, user.isTwoFaEnabled())
+                        .bind(17, user.getPicture())
                         .execute();
+
             });
             return rowsAffected > 0;
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi để debug
+            System.err.println("❌ LỖI KHI INSERT:");
+            e.printStackTrace(); // Xem lỗi SQL
             return false; // Trả về false nếu có lỗi
         }
     }
@@ -81,19 +94,52 @@ public class UserDaoImpl implements IUserDao {
 
     @Override
     public User getUserByUserId(Integer userId) {
-        try {
-            return JDBIConnector.getConnect().withHandle(handle -> {
-                return handle.createQuery(SELECT_USER + " WHERE id = :userId")
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery("SELECT * FROM users WHERE id = :userId")
                         .bind("userId", userId)
-                        .mapToBean(User.class)
+                        .map((rs, ctx) -> {
+                            User user = new User();
+                            user.setId(rs.getInt("id"));
+                            user.setUsername(rs.getString("username"));
+                            user.setPassword(rs.getString("password"));
+                            user.setOauthProvider(rs.getString("oauth_provider"));
+                            user.setOauthUid(rs.getString("oauth_uid"));
+                            user.setOauthToken(rs.getString("oauth_token"));
+                            user.setName(rs.getString("name"));
+                            user.setEmail(rs.getString("email"));
+                            user.setRoleId(rs.getInt("role_id"));
+
+                            Timestamp createdAt = rs.getTimestamp("created_at");
+                            if (createdAt != null) {
+                                user.setCreatedAt(createdAt.toLocalDateTime());
+                            }
+
+                            Timestamp updatedAt = rs.getTimestamp("updated_at");
+                            if (updatedAt != null) {
+                                user.setUpdatedAt(updatedAt.toLocalDateTime());
+                            }
+
+                            user.setStatus(rs.getInt("status"));
+                            user.setPhone(rs.getString("phone"));
+
+                            Date birthDate = rs.getDate("birth");
+                            if (birthDate != null) {
+                                user.setBirth(birthDate.toLocalDate());
+                            }
+
+                            user.setGender(rs.getString("gender"));
+                            user.setAddress(rs.getString("address"));
+                            user.setSecretKey(rs.getString("secretKey"));
+                            user.setTwoFaEnabled(rs.getBoolean("twoFaEnabled"));
+                            user.setPicture(rs.getString("picture"));
+
+                            return user;
+                        })
                         .findFirst()
-                        .orElse(null);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+                        .orElse(null)
+        );
     }
+
 
     @Override
     public boolean isEmailExists(String email) {
@@ -146,18 +192,18 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public boolean update(User user) {
         try {
-            // Nếu cần cập nhật thông tin 2FA (secret_key, twoFaEnabled), bạn có thể cập nhật thêm vào truy vấn UPDATE
             int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-                return handle.createUpdate("UPDATE users SET username = ?, password = ?, name = ?, email = ?, updated_at = ?, role_id = ?, secret_key = ?, twoFaEnabled = ? WHERE id = ?")
+                return handle.createUpdate("UPDATE users SET username = ?, password = ?, name = ?, email = ?, updated_at = ?, phone = ?, birth = ?, gender = ?, address = ? WHERE id = ?")
                         .bind(0, user.getUsername())
                         .bind(1, user.getPassword())
                         .bind(2, user.getName())
                         .bind(3, user.getEmail())
                         .bind(4, user.getUpdatedAt())
-                        .bind(5, user.getRoleId())
-                        .bind(6, user.getSecretKey())
-                        .bind(7, user.isTwoFaEnabled())
-                        .bind(8, user.getId())
+                        .bind(5, user.getPhone())
+                        .bind(6, user.getBirth())
+                        .bind(7, user.getGender())
+                        .bind(8, user.getAddress())
+                        .bind(9, user.getId())
                         .execute();
             });
             return rowsAffected > 0;
@@ -166,6 +212,7 @@ public class UserDaoImpl implements IUserDao {
             return false;
         }
     }
+
 
     @Override
     public User isUserExists(String oauthProvider, String oauthUid) {

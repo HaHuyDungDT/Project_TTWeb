@@ -119,6 +119,7 @@
                                 <c:set var="totalPrice" value="${totalPrice + (item.product.price * item.quantity)}"/>
                             </c:forEach>
                         </div>
+                        <c:set var="totalPrice" value="${totalPrice}" />
                         <c:if test="${not empty sessionScope.coupons}">
                             <div class="order-col">
                                 <div>Chọn mã giảm giá</div>
@@ -288,6 +289,8 @@
         document.getElementById('selectedProvince').value = provinceName;
         document.getElementById('selectedDistrict').value = districtName;
         document.getElementById('selectedWard').value = wardName;
+
+        fetchAndUpdateTotalPrice();
     }
 </script>
 <script>
@@ -349,6 +352,36 @@
         // Cập nhật vào hidden field để submit form
         document.getElementById('hiddenTotalPrice').value = totalPrice;
     }
+
+    function fetchAndUpdateTotalPrice() {
+        var couponId = document.getElementById('couponSelect')?.value || "";
+
+        var shippingFeeText = document.getElementById('formattedPrice').textContent.replace(' VNĐ', '').replace(/\./g, '');
+        var shippingFee = parseInt(shippingFeeText) || 0;
+
+        $.ajax({
+            url: 'update-total-price',
+            type: 'POST',
+            data: {
+                couponId: couponId,
+                shippingFee: shippingFee
+            },
+            success: function(response) {
+                if (response && response.totalPrice !== undefined) {
+                    var formatted = new Intl.NumberFormat('vi-VN').format(response.totalPrice) + ' VNĐ';
+                    document.getElementById('product-price').textContent = formatted;
+                    document.getElementById('hiddenTotalPrice').value = response.totalPrice;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Update total price failed", error);
+            }
+        });
+    }
+
+
+
+
 </script>
 
 

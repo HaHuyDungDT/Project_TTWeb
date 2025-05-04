@@ -221,7 +221,7 @@ $(document).ready(function () {
 			console.error("Error fetching provinces", error);
 		}
 	});
-	/*Khi tỉnh thành đuọcw chọn thì quận huyện cập nhật theo tỉnh thành đó*/
+	/*Khi tỉnh thành được chọn thì quận huyện cập nhật theo tỉnh thành đó*/
 	$('#province-select').change(function () {
 		var provinceID = $(this).val();
 		if (provinceID != null) {
@@ -277,9 +277,9 @@ $(document).ready(function () {
 	});
 	/*Khi phườg xã thay đổi thì giá tiền sẽ cập nhật*/
 	$('#ward-select').change(function () {
-		let fromProvinceID = 202; // Thành phố Hồ Chí Minh
-		let fromDistrictID = 3695; // Thủ Đức
-		let fromWard = "90737"; // Linh Trung
+		let fromProvinceID = 202;
+		let fromDistrictID = 3695;
+		let fromWard = "90737";
 		let toProvinceId = parseInt($('#province-select').val());
 		let toDistrictID = parseInt($('#district-select').val());
 		let toWard = $(this).val();
@@ -304,7 +304,7 @@ $(document).ready(function () {
 			},
 			error: function (error) {
 				console.log("Error calculating fee", error);
-				$('#fee-delivery').html('<strong>Lỗi thiệt</strong>');
+				$('#fee-delivery').html('<strong>Lỗi</strong>');
 			}
 		});
 	});

@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.JsonObject;
 import model.User;
+import model.cart.Cart;
 import model.cart.CartItem;
 import service.ICartService;
 import service.impl.CartServiceImpl;
@@ -43,18 +44,19 @@ public class AddCartItemRestController extends HttpServlet {
         }
 
         Integer userId = user.getId();
-        Integer cartId = cartService.findByUserId(userId).getId();
+        Cart cartId = cartService.findByUserId(userId);
 
-        if (productId != null && userId != null && cartId != null) {
+        if (userId != null && cartId != null) {
             CartItem cartItem = new CartItem();
             cartItem.setId(UUID.randomUUID().toString());
-            cartItem.setCartId(cartId);
+            cartItem.setCartId(cartId.getId());
             cartItem.setProductId(productId);
             cartItem.setQuantity(1);
             cartService.addCartItem(cartItem);
         }
 
-        Integer totalItem = cartService.getTotalCartItem(cartId);
+        assert cartId != null;
+        Integer totalItem = cartService.getTotalCartItem(cartId.getId());
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("status", "Thêm vào giỏ hàng thành công");
         jsonObject.addProperty("code", 202);

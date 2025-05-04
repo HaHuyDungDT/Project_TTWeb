@@ -22,6 +22,43 @@
         .auth-link:last-child {
             margin-right: 0;
         }
+
+        #search-results {
+            position: absolute;
+            background-color: white;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            z-index: 999;
+            display: none; /* Ban đầu ẩn dropdown */
+        }
+
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .search-result-item a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .search-result-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-results {
+            padding: 10px;
+            color: #888;
+        }
+
+        #search-results.show {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -68,9 +105,10 @@
 
                 <!-- SEARCH BAR -->
                 <div class="col-md-6">
-                    <div class="header-search">
-                        <form action="search" method="get">
-                            <input class="input" name="name" placeholder="Tìm kiếm tại đây" value="${param.name}">
+                    <div class="header-search" style="position: relative;">
+                        <form action="${pageContext.request.contextPath}/productList" method="get" id="searchForm">
+                            <input class="input" id="searchInput" name="query" placeholder="Tìm kiếm tại đây">
+                            <div id="search-results" class="search-results"></div>
                             <input class="search-btn" type="submit" name="" value="Tìm kiếm">
                         </form>
                     </div>
@@ -129,6 +167,49 @@
             $('#cart-quantity').text("0");
         }
     });
+
+    $(document).ready(function () {
+        $('#searchInput').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/autocomplete',
+                    method: 'GET',
+                    data: { query: query },
+                    dataType: 'json',
+                    success: function(response) {
+                        var resultHtml = '';
+                        if (response.length > 0) {
+                            response.forEach(function(product) {
+                                resultHtml += `<div class="search-result-item">
+    <a href="${pageContext.request.contextPath}/productList?id=\${product.id}">
+       \${product.name} - \${product.price} VND
+    </a>
+</div>`;
+                            });
+                        } else {
+                            resultHtml = '<div class="no-results">Không tìm thấy sản phẩm nào</div>';
+                        }
+                        $('#search-results').html(resultHtml).addClass('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Lỗi khi tìm kiếm:', error);
+                        $('#search-results').html('<div class="no-results">Không thể tìm kiếm</div>').addClass('show');
+                    }
+                });
+            } else {
+                $('#search-results').html('').removeClass('show');
+            }
+        });
+
+        $(document).click(function(event) {
+            if (!$(event.target).closest('#searchInput').length) {
+                $('#search-results').removeClass('show');
+            }
+        });
+    });
+
 </script>
 </body>
 </html>
+

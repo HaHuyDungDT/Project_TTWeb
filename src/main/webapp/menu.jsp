@@ -20,7 +20,7 @@
       <!-- NAV -->
       <ul class="main-nav nav navbar-nav">
         <li><a href="index.jsp">Trang chủ</a></li>
-        <li><a href="danhmucsanpham.jsp">Danh mục sản phẩm</a></li>
+        <li><a href="${pageContext.request.contextPath}/productList">Danh mục sản phẩm</a></li>
         <li><a href="index.jsp#hot-deal">Khuyến mãi</a></li>
         <li><a href="gioithieu.jsp">Giới thiệu</a>
         <li><a href="lienhe.jsp">Liên hệ</a>

@@ -114,32 +114,38 @@
 
             <div id="content" class="row">
                 <!-- fullproduct -->
-                <c:forEach var="product" items="${a.findAll()}">
-                    <div class="col-md-4 col-xs-6">
-                        <div class="product">
-                            <div class="product-img">
-                                <img src="${product.images[0].linkImage}" alt="">
-                            </div>
-                            <div class="product-body">
-                                <p class="product-category">${product.producer.name}</p>
-                                <h3 class="product-name"><a href="product?id=${product.id}">${product.name}</a></h3>
-                                <fmt:formatNumber value="${product.price}" type="number" pattern="#,##0" var="formattedPrice"/>
-                                <h4 class="product-price">${formattedPrice} VNĐ</h4>
-                                <div class="product-rating">
-                                    <!-- Add rating logic here if needed -->
+                <c:if test="${not empty productList}">
+                    <c:forEach var="product" items="${productList}">
+                        <div class="col-md-4 col-xs-6">
+                            <div class="product">
+                                <div class="product-img">
+                                    <img src="${product.images[0].linkImage}" alt="">
                                 </div>
-                                <div class="product-btns">
-                                    <!-- Add any additional buttons here if needed -->
+                                <div class="product-body">
+                                    <p class="product-category">${product.producer.name}</p>
+                                    <h3 class="product-name"><a href="product?id=${product.id}">${product.name}</a></h3>
+                                    <fmt:formatNumber value="${product.price}" type="number" pattern="#,##0" var="formattedPrice"/>
+                                    <h4 class="product-price">${formattedPrice} VNĐ</h4>
+                                    <div class="product-rating">
+                                        <!-- Add rating logic here if needed -->
+                                    </div>
+                                    <div class="product-btns">
+                                        <!-- Add any additional buttons here if needed -->
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="add-to-cart">
-                                <button class="add-to-cart-btn" data-product="${product.id}">
-                                    <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
-                                </button>
+                                <div class="add-to-cart">
+                                    <button class="add-to-cart-btn" data-product="${product.id}">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </c:forEach>
+                    </c:forEach>
+                </c:if>
+
+                <c:if test="${empty productList}">
+                    <h3>Không có sản phẩm nào để hiển thị.</h3>
+                </c:if>
             </div>
             <!-- /fullproduct -->
 

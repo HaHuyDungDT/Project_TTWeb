@@ -184,13 +184,6 @@
         // Cập nhật tổng tiền
         updateTotalAmount();
     });
-    $('.btn-plus').click(function () {
-        var input = $(this).closest('.input-group').find('input');
-        var newValue = parseInt(input.val()) + 1;
-        input.val(newValue);
-        var productId = $(this).closest('.cart-item').attr('id').split('-')[1];
-        updateQuantity(productId, newValue);
-    });
 
     $('.quantity input').change(function () {
         var newValue = parseInt($(this).val());

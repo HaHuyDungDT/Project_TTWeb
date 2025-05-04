@@ -47,13 +47,17 @@ public class RegisterController extends HttpServlet {
                 user.setPassword(password);
                 user.setName(name);
                 user.setEmail(email);
+                user.setPhone(null);
+                user.setBirth(null);
+                user.setGender(null);
+                user.setAddress(null);
                 user.setOauthProvider(null);
                 user.setOauthUid(null);
                 user.setOauthToken(null);
                 user.setRoleId(4); // Regular User
                 user.setCreatedAt(LocalDateTime.now());
                 user.setUpdatedAt(LocalDateTime.now());
-                user.setStatus(1); // trạng thái kích hoạt
+                user.setStatus(1);// trạng thái kích hoạt
 
                 // Lưu user vào session với key "user"
                 SessionUtil.getInstance().putKey(req, "user", user);

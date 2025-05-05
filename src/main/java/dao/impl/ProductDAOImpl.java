@@ -11,6 +11,22 @@ import java.util.List;
 public class ProductDAOImpl implements IProductDAO {
     private static final String BASE_QUERY = "SELECT id, name, price, product_type_id, producer_id, quantity, status, coupon_id, detail, import_date FROM products WHERE active = 1 ";
 
+    public static Product getById(String id) {
+        try {
+            return JDBIConnector.getConnect()
+                    .withHandle(handle ->
+                            handle.createQuery("SELECT id, name, price, product_type_id as productTypeID, producer_id as producerID, quantity, status, coupon_id as couponId, detail, import_date FROM products WHERE id = :id AND active = 1")
+                                    .bind("id", Integer.parseInt(id))
+                                    .mapToBean(Product.class)
+                                    .findOne()
+                                    .orElse(null)
+                    );
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     public boolean addProduct(Product product) {
 
@@ -78,15 +94,22 @@ public class ProductDAOImpl implements IProductDAO {
         return product;
     }
 
+
+
     @Override
     public List<Product> findByName(String name) {
-        List<Product> products = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createQuery(BASE_QUERY + " AND (name LIKE '" + name + "%'" + " OR name LIKE '%" + name + "%'" + " OR name LIKE '%" + name + "')")
-                    .mapToBean(Product.class)
-                    .list();
-        });
+        String sql = BASE_QUERY + " AND name LIKE :searchPattern";
+        String pattern = "%" + name + "%";
+        List<Product> products = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("searchPattern", pattern)
+                        .mapToBean(Product.class)
+                        .list()
+        );
         return products;
     }
+
+
 
     @Override
     public List<Product> findByCategory(Integer categoryId) {
@@ -203,9 +226,4 @@ public class ProductDAOImpl implements IProductDAO {
         return products;
     }
 
-    public static void main(String[] args) {
-        ProductDAOImpl p = new ProductDAOImpl();
-       // System.out.println(p.findAll());
-        System.out.println(p.findNewProduct());
-    }
 }

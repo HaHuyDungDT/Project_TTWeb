@@ -52,9 +52,11 @@
     <c:if test="${error != null}">
         <p class="alert alert-danger" id="errorMessage">${error}</p>
     </c:if>
-    <form action="login" method="post">
+    <form action="login" method="post" onsubmit="return validateCaptcha()">
         <input type="text" placeholder="Tên đăng nhập" name="username" required value="${username}">
         <input type="password" placeholder="Mật khẩu" name="password" required value="${password}">
+        <div class="g-recaptcha" data-sitekey="6LcO8S4rAAAAAAImGtcuOSXPiJ2PlG30HGpY_7lw"></div>
+        <br/>
         <div class="recover">
             <a href="quenmatkhau">Quên mật khẩu?</a>
         </div>
@@ -133,6 +135,17 @@
             errorMsg.style.display = "none";
         }
     }, 2000);
+
+    function validateCaptcha() {
+        var captchaResponse = grecaptcha.getResponse();
+        if (captchaResponse.length === 0) {
+            alert("Vui lòng hoàn thành CAPTCHA!");
+            return false; // Ngừng gửi form nếu CAPTCHA chưa được hoàn thành
+        }
+        return true; // Cho phép gửi form nếu CAPTCHA đã được hoàn thành
+    }
+
 </script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>

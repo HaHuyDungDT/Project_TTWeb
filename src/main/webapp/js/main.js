@@ -283,6 +283,7 @@ $(document).ready(function () {
 		let toProvinceId = parseInt($('#province-select').val());
 		let toDistrictID = parseInt($('#district-select').val());
 		let toWard = $(this).val();
+
 		$.ajax({
 			url: `https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee?from_province_id=202&from_district_id=3695&from_ward_code=90737&to_province_id=${toProvinceId}&to_district_id=${toDistrictID}&to_ward_code=${toWard}&service_type_id=2&weight=500`,
 			type: "GET",
@@ -292,19 +293,30 @@ $(document).ready(function () {
 			},
 			success: function (response) {
 				if (response.code === 200) {
+					let shippingFee = response.data.total; // Phí vận chuyển (số nguyên)
 					let formattedFee = new Intl.NumberFormat('vi-VN', {
 						style: 'currency',
 						currency: 'VND'
-					}).format(response.data.total);
+					}).format(shippingFee);
 					$('#formattedPrice').html(formattedFee);
+
+					// Cập nhật tổng tiền trên giao diện
+					updateTotalPrice(shippingFee);
+
+					// Đồng bộ với server
+					fetchAndUpdateTotalPrice();
 				} else {
 					console.error("Error calculating fee", response.message);
-					$('#fee-delivery').html('<strong>Success nhưng lỗi</strong>');
+					$('#formattedPrice').html('0 VNĐ');
+					updateTotalPrice(0);
+					fetchAndUpdateTotalPrice();
 				}
 			},
 			error: function (error) {
-				console.log("Error calculating fee", error);
-				$('#fee-delivery').html('<strong>Lỗi</strong>');
+				console.error("Error calculating fee", error);
+				$('#formattedPrice').html('0 VNĐ');
+				updateTotalPrice(0);
+				fetchAndUpdateTotalPrice();
 			}
 		});
 	});

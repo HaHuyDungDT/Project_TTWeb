@@ -328,34 +328,35 @@
     }
 
     function updateTotalPrice(shippingFee) {
-        // Lấy tổng giá sản phẩm ban đầu
-        var totalPriceElement = document.getElementById('product-price');
-        var totalPriceText = totalPriceElement.textContent.replace(' VNĐ', '').replace(/\./g, '');
-        var totalPrice = parseInt(totalPriceText) || 0;
+        // Lấy tổng giá gốc từ các sản phẩm
+        var orderProducts = document.querySelectorAll('.order-products .order-col');
+        var totalPrice = 0;
 
-        // Áp dụng giảm giá nếu có
+        orderProducts.forEach(function(productRow) {
+            var priceElement = productRow.querySelector('.product-price');
+            var originalPrice = parseFloat(priceElement.getAttribute('data-original-price'));
+            var quantity = parseInt(productRow.querySelector('div').textContent) || 1; // Lấy số lượng
+            totalPrice += originalPrice * quantity;
+        });
+
+        // Áp dụng mã giảm giá
         var couponSelect = document.getElementById('couponSelect');
         if (couponSelect) {
             var discountPercent = parseFloat(couponSelect.options[couponSelect.selectedIndex].getAttribute('data-discount')) || 0;
             totalPrice = totalPrice * (1 - discountPercent / 100);
         }
 
-        // Cộng thêm phí vận chuyển
-        totalPrice += shippingFee;
+        // Cộng phí vận chuyển
+        totalPrice += shippingFee || 0;
 
-        // Định dạng lại số tiền
+        // Cập nhật giao diện
         var formattedTotal = new Intl.NumberFormat('vi-VN').format(totalPrice) + ' VNĐ';
-
-        // Cập nhật lên giao diện
-        totalPriceElement.textContent = formattedTotal;
-
-        // Cập nhật vào hidden field để submit form
+        document.getElementById('product-price').textContent = formattedTotal;
         document.getElementById('hiddenTotalPrice').value = totalPrice;
     }
 
     function fetchAndUpdateTotalPrice() {
         var couponId = document.getElementById('couponSelect')?.value || "";
-
         var shippingFeeText = document.getElementById('formattedPrice').textContent.replace(' VNĐ', '').replace(/\./g, '');
         var shippingFee = parseInt(shippingFeeText) || 0;
 
@@ -378,7 +379,6 @@
             }
         });
     }
-
 
 
 

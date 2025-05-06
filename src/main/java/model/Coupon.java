@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -14,7 +15,7 @@ public class Coupon {
     private Integer id;
     private String code;
     private Integer percent_discount;
-    private Date date_start;
-    private Date date_end;
+    private Timestamp date_start;
+    private Timestamp  date_end;
     private List<Product> products;
 }

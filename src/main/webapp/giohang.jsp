@@ -256,9 +256,7 @@
             total += price * quantity;
         });
 
-        // Format số tiền và cập nhật lên giao diện
-        var formattedAmount = new Intl.NumberFormat('vi-VN').format(total);
-        $('#totalAmountLabel').html('<strong>Tổng tiền : ' + formattedAmount + '</strong>');
+        $('#totalAmountLabel').html('<strong>Tổng tiền : ' + formatter.format(total).replace(/₫/, 'VNĐ') + '</strong>');
     }
 
     // Gọi hàm khi số lượng thay đổi

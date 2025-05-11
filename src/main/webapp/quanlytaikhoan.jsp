@@ -1,5 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
+<%@ page import="dao.impl.UserDaoImpl" %>
+<%--<%--%>
+<%--    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");--%>
+<%--    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;--%>
+<%--    if (currentUser == null || "0".equals(currentUser.getRoleId())) {--%>
+<%--        response.sendRedirect("dangnhap.jsp");--%>
+<%--    }--%>
+<%--%>--%>
+
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -23,6 +35,7 @@
     <!-- End import lib -->
     <link rel="stylesheet" type="text/css" href="css/styleAdmin.css">
 </head>
+
 <body class="overlay-scrollbar">
 <!-- navbar -->
 <div class="navbar">
@@ -59,12 +72,12 @@
                                 <i class="fas fa-gift"></i>
                             </div>
                             <span>
-									Thông báo kết thúc khuyến mãi
-									<br>
-									<span>
-										15/07/2020
-									</span>
-								</span>
+                Thông báo kết thúc khuyến mãi
+                <br>
+                <span>
+                  15/07/2020
+                </span>
+              </span>
                         </a>
                     </li>
                 </div>
@@ -101,6 +114,7 @@
     </ul>
     <!-- end nav right -->
 </div>
+
 <!-- end navbar -->
 <!-- sidebar -->
 <div class="sidebar">
@@ -112,7 +126,7 @@
                 </div>
                 <span>
 						Thông số bán hàng
-					</span>
+                </span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -149,11 +163,27 @@
         </li>
     </ul>
 </div>
+
+
 <!-- end sidebar -->
 <!-- main content -->
 <div class="wrapper">
     <div class="row">
         <div class="col-8 col-m-12 col-sm-12">
+
+            <c:if test="${not empty successMessage}">
+                <div class="alert alert-success text-center" style="margin: 10px;">
+                        ${successMessage}
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        setTimeout(() => {
+                            $(".alert-success").fadeOut();
+                        }, 3000); // 3 giây tự động biến mất
+                    });
+                </script>
+            </c:if>
+
             <div class="card">
                 <div class="card-header" style="display: flex">
                     <h3>
@@ -161,10 +191,9 @@
                     </h3>
                     <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="margin-left: auto">
                         <span>Thêm tài khoản mới</span></a>
-
                 </div>
                 <div class="card-content">
-                    <table>
+                    <table class="table table-striped">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -172,9 +201,11 @@
                             <th>Số điện thoại</th>
                             <th>Ngày Sinh</th>
                             <th>Giới tính</th>
+                            <th>Địa chỉ</th>
                             <th>Email</th>
-                            <th>User</th>
+                            <th>Username</th>
                             <th>Password</th>
+                            <th>Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -182,28 +213,31 @@
                             <tr>
                                 <td>${item.id}</td>
                                 <td>${item.name}</td>
-                                <td>${item.phone_number}</td>
-                                <td>${item.birth_day}</td>
-                                <td>${item.sex}</td>
+                                <td>${item.phone}</td>
+                                <td>${item.birth}</td>
+                                <td>${item.gender}</td>
+                                <td>${item.address}</td>
                                 <td>${item.email}</td>
-                                <td>${item.user_name}</td>
+                                <td>${item.username}</td>
                                 <td>${item.password}</td>
                                 <td>
                                     <a href="#"
                                        data-id="${item.id}"
                                        data-name="${item.name}"
-                                       data-phone_number="${item.phone_number}"
-                                       data-birth_day="${item.birth_day}"
-                                       data-sex="${item.sex}"
+                                       data-phone_number="${item.phone}"
+                                       data-birth="${item.birth}"
+                                       data-gender="${item.gender}"
+                                       data-address="${item.address}"
                                        data-email="${item.email}"
-                                       data-user_name="${item.user_name}"
+                                       data-user_name="${item.username}"
                                        data-password="${item.password}"
                                        class="edit"
                                        data-toggle="modal">
                                         <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
                                     </a>
-                                    <a href="#" data-id="${item.id}" class="delete" data-toggle="modal"><i
-                                            class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                    <a href="#" data-id="${item.id}" class="delete" data-toggle="modal">
+                                        <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+                                    </a>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -213,149 +247,153 @@
             </div>
         </div>
     </div>
-    <!-- Edit-->
-    <div id="editEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/account/edit" method="post" id="edit">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Thay đổi thông tin</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+</div>
+<!-- Edit-->
+<div id="editEmployeeModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action ="/quanlytaikhoan/account-edit" id="edit" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Thay đổi thông tin</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" hidden class="form-control" required name="id" id="editId">
+                    <div class="form-group">
+                        <label>Họ tên</label>
+                        <input type="text" class="form-control" required name="name" id="editName">
                     </div>
-                    <div class="modal-body">
-                        <input type="text" hidden class="form-control" required name="id" id="editId">
-                        <div class="form-group">
-                            <label>Họ tên</label>
-                            <input type="text" class="form-control" required name="name" id="editName">
-                        </div>
-                        <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="tel" class="form-control" required name="phone" id="editPhone">
-                        </div>
-                        <div class="form-group">
-                            <label>Địa chỉ</label>
-                            <textarea class="form-control" required name="address" id="editAddress"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày sinh</label>
-                            <input type="date" class="form-control" required name="date" id="editDate">
-                        </div>
-                        <div class="form-group">
-                            <label>Giới tính</label>
-                            <select class="form-control" required name="gender" id="editGender">
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" required name="email" id="editEmail">
-                        </div>
-                        <div class="form-group">
-                            <label>User</label>
-                            <input type="text" class="form-control" required name="user" id="editUser">
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" class="form-control" required name="password" id="editPassword">
-                        </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="tel" class="form-control" required name="phone" id="editPhone">
                     </div>
-                    <div class="modal-footer">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
-                        <input type="submit" class="btn btn-info" value="Lưu">
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <textarea class="form-control" required name="address" id="editAddress"></textarea>
                     </div>
-                </form>
-            </div>
+                    <div class="form-group">
+                        <label>Ngày sinh</label>
+                        <input type="date" class="form-control" required name="date" id="editDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Giới tính</label>
+                        <select class="form-control" required name="gender" id="editGender">
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" required name="email" id="editEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>User</label>
+                        <input type="text" class="form-control" required name="user" id="editUser">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" required name="password" id="editPassword">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                    <button type="submit" class="btn btn-info">Lưu</button>
+                </div>
+            </form>
         </div>
     </div>
-    <!--/ Edit-->
+</div>
+<!--/ Edit-->
 
-    <!-- Delete-->
+<!-- Delete-->
 
-    <div id="deleteEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/account/delete" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Xóa tài khoản này</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Bạn có chắc chắn muốn xóa tài khoản này?</p>
-                        <p class="text-warning"><small>Hành động này sẽ không thể hoàn lại.</small></p>
-                    </div>
-                    <input type="text" hidden name="id" id="idDel">
-                    <div class="modal-footer">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
-                        <input type="submit" id="btnDel" class="btn btn-danger" value="Xóa">
-                    </div>
-                </form>
-            </div>
+<div id="deleteEmployeeModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/quanlytaikhoan/account-delete"  id="deleteForm" method="post">
+                <div class="modal-header">
+                    <h4 class="modal-title">Xóa tài khoản này</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa tài khoản này?</p>
+                    <p class="text-warning"><small>Hành động này sẽ không thể hoàn lại.</small></p>
+                </div>
+                <input type="text" hidden name="id" id="idDel">
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                    <button type="submit" id="btnDel" class="btn btn-danger">Xóa</button> <!-- Sửa nút submit -->
+                </div>
+            </form>
         </div>
     </div>
-    <!--/ Delete-->
-    <!--/ Add-->
-    <div id="addEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/account/add" method="post" id="add">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Thêm tài khoản mới</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+</div>
+<!--/ Delete-->
+<!--/ Add -->
+<div id="addEmployeeModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/quanlytaikhoan/account-add" method="post" id="add">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Thêm tài khoản mới</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Họ tên</label>
+                        <input type="text" class="form-control" required name="name" id="addName">
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Họ tên</label>
-                            <input type="text" class="form-control" required name="name" id="addName">
-                        </div>
-                        <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="tel" class="form-control" required name="phone" id="addPhone">
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày sinh</label>
-                            <input type="date" class="form-control" required name="date" id="addDate">
-                        </div>
-                        <div class="form-group">
-                            <label>Giới tính</label>
-                            <select class="form-control" required name="gender" id="addGender">
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Quyền</label>
-                            <select class="form-control" required name="role" id="addRole">
-                                <option value="admin">Admin</option>
-                                <option value="user">Khách hàng</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Địa chỉ</label>
-                            <textarea class="form-control" required name="address" id="addAddress"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" required name="email" id="addEmail">
-                        </div>
-                        <div class="form-group">
-                            <label>User</label>
-                            <input type="text" class="form-control" required name="user" id="addUser">
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" class="form-control" required name="password" id="addPassword">
-                        </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="tel" class="form-control" required name="phone" id="addPhone">
                     </div>
-                    <div class="modal-footer">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
-                        <input type="button" id="btnAdd" class="btn btn-success" value="Thêm">
+                    <div class="form-group">
+                        <label>Ngày sinh</label>
+                        <input type="date" class="form-control" required name="birth" id="addDate">
                     </div>
-                </form>
-            </div>
+                    <div class="form-group">
+                        <label>Giới tính</label>
+                        <select class="form-control" required name="gender" id="addGender">
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quyền</label>
+                        <select class="form-control" required name="role" id="addRole">
+                            <option value="1">Admin</option>
+                            <option value="2">Khách hàng</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <textarea class="form-control" required name="address" id="addAddress"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" required name="email" id="addEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>User</label>
+                        <input type="text" class="form-control" required name="user" id="addUser">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" required name="password" id="addPassword">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                </div>
+            </form>
         </div>
     </div>
-    <!--/ Add -->
+</div>
+
+
 </div>
 <!-- end main content -->
 
@@ -365,115 +403,162 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
 <!-- end import script -->
 <script>
-    $('.delete').off('click').on('click', function (e){
+
+
+    $(document).on('click', '.edit', function (e) {
+
         e.preventDefault();
-        var btn = $(this);
-        $('#idDel').val(btn.data('id'));
-        $('#deleteEmployeeModal').modal('show');
-    });
-    $('.edit').off('click').on('click', function (e){
-        e.preventDefault();
-        var btn = $(this);
+        const btn = $(this);
+        const id = btn.data('id');
+        console.log("Đã click edit với ID: ", id);
+
+        // Gọi API để lấy dữ liệu user
         $.ajax({
-            url: "/account/edit?id=" + btn.data('id'),
-            dataType: "json",
+            url: "/quanlytaikhoan/account-edit?id=" + id,
             method: "GET",
-            success: (rs) => {
-                $('#editId').val(btn.data('id'));
-                $('#editAddress').val(rs);
-                $('#editName').val(btn.data('name'));
-                $('#editPhone').val(btn.data('phone_number'));
-                $('#editDate').val(btn.data('birth_day'));
-                $('#editGender').val(btn.data('sex'));
-                $('#editEmail').val(btn.data('email'));
-                $('#editUser').val(btn.data('user_name'));
-                $('#editPassword').val(btn.data('password'));
+            dataType: "json",
+            //     success: function (user) {
+            //       $('#editId').val(user.id);
+            //       $('#editName').val(user.name);
+            //       $('#editPhone').val(user.phone);
+            //       $('#editAddress').val(user.address);
+            //       $('#editDate').val(user.birth);
+            //       $('#editGender').val(user.gender);
+            //       $('#editEmail').val(user.email);
+            //       $('#editUser').val(user.username);
+            //       $('#editPassword').val(""); // clear password input
+            //       $('#editEmployeeModal').modal('show');
+            //     },
+            //     error: function () {
+            //       alert("Không thể lấy thông tin người dùng");
+            //     }
+            //   });
+            // });
+            success: function (user) {
+                $('#editId').val(user.id);
+                $('#editName').val(user.name);
+                $('#editPhone').val(user.phone);
+                $('#editAddress').val(user.address);
+
+                // ⚠️ xử lý ngày sinh: nếu null thì để trống, nếu không thì format yyyy-MM-dd
+                if (user.birth) {
+                    const dateObj = new Date(user.birth);
+                    const formattedDate = dateObj.toISOString().split('T')[0];
+                    $('#editDate').val(formattedDate);
+                } else {
+                    $('#editDate').val('');
+                }
+
+                $('#editGender').val(user.gender);
+                $('#editEmail').val(user.email);
+                $('#editUser').val(user.username);
+                $('#editPassword').val("");
                 $('#editEmployeeModal').modal('show');
             },
-            error: (rs) => {
-                console.log(rs);
+            error: function () {
+                alert("Không thể lấy thông tin người dùng");
             }
+        });
+    });
+
+
+
+
+    $(document).ready(function() {
+        // Sự kiện xóa tài khoản
+        $('.delete').on('click', function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            var id = btn.data('id');
+            $('#idDel').val(id);  // Lưu ID vào input hidden
+            $('#deleteEmployeeModal').modal('show'); // Hiển thị modal xác nhận
+
+            // Xử lý xóa tài khoản khi nhấn nút Xóa trong modal
+            $('#btnDel').on('click', function () {
+                $.ajax({
+                    url: "/quanlytaikhoan/account-delete",  // Đường dẫn xóa tài khoản
+                    method: "POST",
+                    data: { id: id },
+                    success: function (response) {
+                        // alert('Xóa tài khoản thành công');
+                        location.reload();  // Reload lại trang
+                    },
+                    error: function () {
+                        alert('Đã có lỗi xảy ra khi xóa tài khoản');
+                    }
+                });
+            });
         });
 
-    });
-    $('#btnDel').on('click', function (){
-        alert('Xóa tài khoản thành công');
-    });
-    $('#edit').on('submit', function (){
-        alert('Cập nhập tài khoản thành công');
-    });
-    $('#add').on('submit', function (){
-        alert('Thêm tài khoản thành công');
-    });
-    function removeAscent(str) {
-        str = str.trim();
-        if (str === null || str === undefined) {
-            return str;
-        }
-        str = str.toLowerCase();
-        str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/gi, "a");
-        str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/gi, "e");
-        str = str.replace(/(ì|í|ị|ỉ|ĩ)/gi, "i");
-        str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/gi, "o");
-        str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/gi, "u");
-        str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/gi, "y");
-        str = str.replace(/đ/gi, "d");
-        return str;
-    }
-    $('#btnAdd').on('click', function (){
-        let name = $('#addName').val();
-        let address = $('#addAddress').val();
-        let date = $('#addDate').val();
-        let phone = $('#addPhone').val();
-        let email = $('#addEmail').val();
-        let user = $('#addUser').val();
-        let password = $('#addPassword').val();
-        if(!name || !address || !date || !phone || !email || !user || !password){
-            alert('Hãy nhập đầy đủ thông tin!');
-            return;
-        }
-        var regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i;
-        if (!regexEmail.test(removeAscent(email))) {
-            alert('Sai định dạng Email, phải có @ đuôi là tên miền');
-            return;
-        }
-        var regexPhone = /^0(3|5|7|8|9)[0-9]{8}$/i;
-        if (!regexPhone.test(removeAscent(phone))) {
-            alert('Sai định dạng, chỉ gồm 10 chữ số bắt đầu bằng 03 hoặc 05 hoặc 07 hoặc 08 hoặc 09');
-            return;
-        }
-        $.ajax({
-            url: "/account/add?email=" + $('#addEmail').val(),
-            dataType: "json",
-            method: "GET",
-            success: (rs) => {
-                if(rs){
-                    $.ajax({
-                        url: "/account/add?user=" + $('#addUser').val(),
-                        dataType: "json",
-                        method: "PUT",
-                        success: (rs) => {
-                            if(rs){
-                                $('#add').submit();
-                            }else{
-                                alert("Username đã tồn tại, vui lòng nhập username khác");
-                            }
-                        },
-                        error: (rs) => {
-                            console.log(rs);
-                        }
-                    });
-                }else{
-                    alert("Email đã tồn tại, vui lòng nhập email khác");
-                }
-            },
-            error: (rs) => {
-                console.log(rs);
+
+        // xử lý form add user---------------------------
+        //ajax
+        $('#add').on('submit', function(e) {
+            e.preventDefault(); // Ngăn form gửi mặc định
+
+            let form = $(this);
+            let name = $('#addName').val();
+            let address = $('#addAddress').val();
+            let date = $('#addDate').val();
+            let phone = $('#addPhone').val();
+            let email = $('#addEmail').val();
+            let user = $('#addUser').val();
+            let password = $('#addPassword').val();
+
+            if (!name || !address || !date || !phone || !email || !user || !password) {
+                alert('Hãy nhập đầy đủ thông tin!');
+                return;
             }
+
+            var regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i;
+            var regexPhone = /^0(3|5|7|8|9)[0-9]{8}$/i;
+
+            if (!regexEmail.test(removeAscent(email))) {
+                alert('Sai định dạng Email!');
+                return;
+            }
+
+            if (!regexPhone.test(removeAscent(phone))) {
+                alert('Sai định dạng số điện thoại!');
+                return;
+            }
+
+            // Kiểm tra email
+            $.ajax({
+                url: "/quanlytaikhoan/account-add?email=" + email,
+                dataType: "json",
+                method: "GET",
+                success: (emailOK) => {
+                    if (emailOK) {
+                        // Kiểm tra user
+                        $.ajax({
+                            url: "/quanlytaikhoan/account-add?user=" + user,
+                            dataType: "json",
+                            method: "PUT",
+                            success: (userOK) => {
+                                if (userOK) {
+                                    // Submit lại thật sự bằng JavaScript
+                                    form.unbind('submit').submit();
+
+                                } else {
+                                    alert("Username đã tồn tại!");
+                                }
+                            }
+                        });
+                    } else {
+                        alert("Email đã tồn tại!");
+                    }
+                }
+            });
         });
-    });
+        // đóng ajax ngoài cùng
+    }); // ✅ ĐÓNG $(document).ready
+
 </script>
+
+
 </body>
 </html>

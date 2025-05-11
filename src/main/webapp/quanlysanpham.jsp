@@ -183,52 +183,56 @@
                             <th>#</th>
                             <th>Tên sản phẩm</th>
                             <th>Giá</th>
-                            <th>Mã loại sản phẩm</th>
-                            <th>Tồn kho</th>
-                            <th>Mã hãng sản xuất</th>
+                            <th>Số lượng</th>
+                            <th>Loại sản phẩm</th>
+                            <th>Nhà sản xuất</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày nhập</th>
+                            <th>Mã giảm giá</th>
                             <th>Hình ảnh</th>
+                            <th>Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <%
-                            ProductDAOImpl productDAO = new ProductDAOImpl();
-                            List<Product> listProduct = productDAO.findAll();
-                            request.setAttribute("listAll", listProduct);
-                            for (Product p : listProduct) {
-                        %>
-                        <tr>
-                            <td><%=p.getId()%>
-                            </td>
-                            <td><%=p.getName()%>
-                            </td>
-                            <td>
-                                <div>
-                                    <fmt:formatNumber value="<%=p.getPrice()%>" type="number" pattern="#,##0"
-                                                      var="formattedPrice"/>
-                                    <h6 class="product-price">${formattedPrice} VNĐ</h6>
-                                </div>
-                            </td>
-                            <td><%=p.getProductType().getId()%>
-                            </td>
-                            <td><%=p.getQuantity()%>
-                            </td>
-                            <td><%=p.getProducer().getId()%>
-                            </td>
-                            <td>
-                                <img style="width: 70px; height: 70px" src="<%=p.getImages()%>" alt="">
-                            </td>
-                            <td>
-                                <a href="#editEmployeeModal" class="edit" data-toggle="modal" data-product-id="<%=p.getId()%>">
-                                    <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-
-                                <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"
-                                   onclick="deleteProduct(<%=p.getId()%>)">
-                                    <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-                            </td>
-                        </tr>
-                        <%
-                            }
-                        %>
+                        <c:forEach var="p" items="${products}">
+                            <tr>
+                                <td>${p.id}</td>
+                                <td>${p.name}</td>
+                                <td>
+                                    <fmt:formatNumber value="${p.price}" type="number" pattern="#,##0" /> VNĐ
+                                </td>
+                                <td>${p.quantity}</td>
+                                <td>${p.productType.name}</td>  <!-- Lấy tên loại sản phẩm -->
+                                <td>${p.producer.name}</td>     <!-- Lấy tên nhà sản xuất -->
+                                <td>${p.status}</td>
+                                <td><fmt:formatDate value="${p.import_date}" pattern="dd/MM/yyyy" /></td> <!-- Định dạng ngày nhập -->
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${not empty p.couponId}">
+                                            ${p.couponId}
+                                        </c:when>
+                                        <c:otherwise>
+                                            Không có
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:forEach var="image" items="${p.images}">
+                                        <img src="${image.linkImage}" alt="Product Image" style="width: 50px; height: 50px;">
+                                    </c:forEach>
+                                </td>
+                                <td>
+                                    <!-- Nút Edit -->
+                                    <a href="#editEmployeeModal" class="edit" data-toggle="modal" data-product-id="${p.id}">
+                                        <i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+                                    </a>
+                                    <!-- Nút Delete -->
+                                    <a href="#deleteEmployeeModal" class="delete" data-toggle="modal" onclick="deleteProduct(${p.id})">
+                                        <i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </div>
@@ -239,48 +243,70 @@
     <div id="editEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="editForm" action="edit" method="post">
+                <!-- Form chỉnh sửa sản phẩm -->
+                <form id="editForm" action="/quanlysanpham/product-edit" method="POST" enctype="multipart/form-data">
                     <div class="modal-header">
-                        <h4 class="modal-title">Thay đổi thông tin</h4>
+                        <h4 class="modal-title">Sửa thông tin sản phẩm</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label>#</label>
-                            <input name="id" value="" type="text" class="form-control" readonly required>
-                        </div>
+                        <input type="hidden" name="id" id="editProductId">
                         <div class="form-group">
                             <label>Tên sản phẩm</label>
-                            <input name="name" value="" type="text" class="form-control" required>
+                            <input name="name" id="editProductName" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Giá</label>
-                            <input name="price" value="" type="text" class="form-control" required>
+                            <input name="price" id="editProductPrice" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Mã loại sản phẩm</label>
-                            <select name="productType" class="form-select">
-                                <c:forEach items="${c.selectAll()}" var="pt">
-                                    <option value="${pt.id}">${pt.id}</option>
-                                </c:forEach>
+                            <label>Số lượng</label>
+                            <input name="quantity" id="editProductQuantity" type="number" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mô tả</label>
+                            <textarea name="detail" id="editProductDetail" class="form-control" required></textarea>
+                        </div>
+                        <!-- Loại sản phẩm -->
+                        <div class="form-group">
+                            <label>Loại sản phẩm</label>
+                            <select name="productType" id="editProductType" class="form-control" required>
+                                <!-- Các lựa chọn sẽ được điền tự động qua AJAX -->
+                            </select>
+                        </div>
+
+                        <!-- Hãng sản xuất -->
+                        <div class="form-group">
+                            <label>Hãng sản xuất</label>
+                            <select name="producer" id="editProductProducer" class="form-control" required>
+                                <!-- Các lựa chọn sẽ được điền tự động qua AJAX -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <select name="status" id="editProductStatus" class="form-control" required>
+                                <option value="available">Còn hàng</option>
+                                <option value="out_of_stock">Hết hàng</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Tồn kho</label>
-                            <input name="quantity" value="" type="number" class="form-control"
-                                   required>
+                            <label>Ngày nhập</label>
+                            <input type="date" name="import_date" id="editProductImportDate" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Mã hãng sản xuất</label>
-                            <select name="productCategory" class="form-select">
-                                <c:forEach items="${b.selectAll()}" var="pc">
-                                    <option value="${pc.id}">${pc.id}</option>
-                                </c:forEach>
-                            </select>
+                            <label>Mã giảm giá</label>
+                            <input name="couponId" id="editProductCouponId" type="text" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label>Hình ảnh</label>
-                            <input name="img" value="" type="text" class="form-control" required>
+                            <label>Ảnh sản phẩm hiện tại</label>
+                            <img id="currentProductImage" src="" alt="Current Product Image" style="width: 100px; height: 100px;">
+                        </div>
+
+                        <!-- Cho phép người dùng tải lên ảnh mới -->
+                        <div class="form-group">
+                            <label>Chọn ảnh sản phẩm mới (nếu có)</label>
+                            <input type="file" name="imageFile" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -297,7 +323,7 @@
     <div id="deleteEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="deleteForm" action="delete" method="post">
+                <form id="deleteForm" action="/quanlysanpham/product-delete" method="post">
                     <div class="modal-header">
                         <h4 class="modal-title">Xóa sản phẩm này</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -320,16 +346,12 @@
     <div id="addEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="add" method="post">
+                <form action="/quanlysanpham/product-add" method="POST" enctype="multipart/form-data">
                     <div class="modal-header">
-                        <h4 class="modal-title">Thêm sản phẩm</h4>
+                        <h4 class="modal-title">Thêm sản phẩm mới</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label>#</label>
-                            <input name="id" type="text" class="form-control" required>
-                        </div>
                         <div class="form-group">
                             <label>Tên sản phẩm</label>
                             <input name="name" type="text" class="form-control" required>
@@ -339,28 +361,48 @@
                             <input name="price" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Mã loại sản phẩm</label>
-                            <select name="productType" class="form-select">
-                                <c:forEach items="${c.selectAll()}" var="pt">
-                                    <option value="${pt.id}">${pt.id}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Tồn kho</label>
+                            <label>Số lượng</label>
                             <input name="quantity" type="number" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Mã hãng sản xuất</label>
-                            <select name="productCategory" class="form-select">
-                                <c:forEach items="${b.selectAll()}" var="pc">
-                                    <option value="${pc.id}">${pc.id}</option>
+                            <label>Mô tả</label>
+                            <textarea name="detail" class="form-control" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Loại sản phẩm</label>
+                            <select name="productType" class="form-control" required>
+                                <c:forEach items="${productTypes}" var="pt">
+                                    <option value="${pt.id}">${pt.name}</option>
                                 </c:forEach>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Hình ảnh</label>
-                            <input name="img" type="text" class="form-control" required>
+                            <label>Hãng sản xuất</label>
+                            <select name="producer" class="form-control" required>
+                                <c:forEach items="${producers}" var="pc">
+                                    <option value="${pc.id}">${pc.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái</label>
+                            <select name="status" class="form-control" required>
+                                <option value="available">Còn hàng</option>
+                                <option value="out_of_stock">Hết hàng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày nhập</label>
+                            <input type="date" name="import_date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã giảm giá</label>
+                            <input name="couponId" type="text" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Chọn ảnh sản phẩm</label>
+                            <input type="file" name="imageFile" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -368,6 +410,7 @@
                         <input type="submit" class="btn btn-success" value="Thêm">
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -465,6 +508,7 @@
         var button = $(event.relatedTarget);
         var productId = button.data('product-id');
 
+
         $('#editForm input[name="id"]').val(productId);
     });
 
@@ -512,6 +556,102 @@
 <!--Script Thông báo Thêm Sản Phẩm-->
 
 <!-- Script -->
+
+<%--AJAX--%>
+<script>
+    $(document).ready(function() {
+        // Sự kiện chỉnh sửa sản phẩm
+        $('.edit').click(function (e) {
+            e.preventDefault();
+            var productId = $(this).data('product-id');
+            console.log("Clicked Edit Product ID: " + productId);  // Debug: In ra ID sản phẩm khi nhấn edit
+
+            $.ajax({
+                url: "/quanlysanpham/product-edit",
+                method: "GET",
+                data: { id: productId },
+                dataType: "json",
+                success: function (response) {
+                    console.log("✅ Dữ liệu sản phẩm:", response);
+
+                    // Gán dữ liệu vào form
+                    $('#editProductId').val(response.product.id || '');
+                    $('#editProductName').val(response.product.name || '');
+                    $('#editProductPrice').val(response.product.price || '');
+                    $('#editProductQuantity').val(response.product.quantity != null ? response.product.quantity : '0');
+                    $('#editProductDetail').val(response.product.detail || '');
+
+                    // Cập nhật loại sản phẩm
+                    var productTypesDropdown = $('#editProductType');
+                    productTypesDropdown.empty();  // Xóa tất cả các lựa chọn hiện tại
+                    response.productTypes.forEach(function(productType) {
+                        var selected = productType.id === response.product.productType.id ? 'selected' : '';
+                        productTypesDropdown.append('<option value="' + productType.id + '" ' + selected + '>' + productType.name + '</option>');
+                    });
+
+                    // Cập nhật hãng sản xuất
+                    var producersDropdown = $('#editProductProducer');
+                    producersDropdown.empty();  // Xóa tất cả các lựa chọn hiện tại
+                    response.producers.forEach(function(producer) {
+                        var selected = producer.id === response.product.producer.id ? 'selected' : '';
+                        producersDropdown.append('<option value="' + producer.id + '" ' + selected + '>' + producer.name + '</option>');
+                    });
+
+                    // Các trường khác
+                    $('#editProductStatus').val(response.product.status || 'available');
+
+                    // Format ngày yyyy-MM-dd
+                    if (response.product.import_date) {
+                        const d = new Date(response.product.import_date);
+                        const formattedDate = d.toISOString().split('T')[0];
+                        $('#editProductImportDate').val(formattedDate);
+                    } else {
+                        $('#editProductImportDate').val('');
+                    }
+
+                    $('#editProductCouponId').val(response.product.couponId || '');
+                    // Hiển thị ảnh sản phẩm hiện tại
+                    if (response.product.images && response.product.images.length > 0) {
+                        $('#currentProductImage').attr('src', response.product.images[0].linkImage);
+                    } else {
+                        $('#currentProductImage').attr('src', 'default-image.jpg'); // Hoặc bạn có thể dùng ảnh mặc định
+                    }
+
+                    // Hiện modal
+                    $('#editEmployeeModal').modal('show');
+                },
+                error: function (xhr) {
+                    console.error("❌ Lỗi khi lấy thông tin sản phẩm:", xhr);
+                    alert('Không thể lấy dữ liệu sản phẩm!');
+                }
+            });
+        });
+
+        // Sự kiện submit chỉnh sửa sản phẩm
+        $('#edit').on('submit', function (e) {
+            e.preventDefault();  // Ngừng hành động submit mặc định của form
+
+            var formData = $(this).serialize(); // Lấy toàn bộ dữ liệu form
+
+            $.ajax({
+                url: "/quanlysanpham/product-edit",
+                method: "POST",
+                data: formData,  // Gửi dữ liệu đã chỉnh sửa lên server
+                success: function (response) {
+                    alert('Cập nhật sản phẩm thành công!');
+                    $('#editProductModal').modal('hide');
+                    location.reload();  // Reload lại trang
+                },
+                error: function () {
+                    alert('Đã có lỗi xảy ra khi cập nhật sản phẩm');
+                }
+            });
+        });
+    });
+
+</script>
+<%--AJAX--%>
+
 
 </body>
 </html>

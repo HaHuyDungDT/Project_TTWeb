@@ -27,39 +27,83 @@ public class ProductDAOImpl implements IProductDAO {
         }
     }
 
-    @Override
-    public boolean addProduct(Product product) {
+//    @Override
+//    public boolean addProduct(Product product) {
+//        String sql = "INSERT INTO products (name, price, quantity, detail, product_type_id, producer_id, status, import_date, coupon_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//        return JDBIConnector.getConnect().withHandle(handle -> {
+//            return handle.createUpdate(sql)
+//                    .bind(0, product.getName())            // Tên sản phẩm
+//                    .bind(1, product.getPrice())           // Giá sản phẩm
+//                    .bind(2, product.getQuantity())        // Số lượng sản phẩm
+//                    .bind(3, product.getDetail())          // Chi tiết sản phẩm
+//                    .bind(4, product.getProductTypeID())   // ID loại sản phẩm
+//                    .bind(5, product.getProducerID())      // ID nhà sản xuất
+//                    .bind(6, product.getStatus())          // Trạng thái sản phẩm
+//                    .bind(7, product.getImport_date())     // Ngày nhập hàng
+//                    .bind(8, product.getCouponId())        // ID mã giảm giá (nếu có)
+//                    .execute() > 0;
+//        });
+//    }
+@Override
+public boolean addProduct(Product product) {
+    String sql = "INSERT INTO products (name, price, quantity, detail, product_type_id, producer_id, status, import_date, coupon_id) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
-                handle.createUpdate("INSERT INTO products (name, price, product_type_id, producer_id, quantity, status, import_date, coupon_id, detail, active) " +
-                                "VALUES (:name, :price, :productTypeId, :producerId, :quantity, :status, :importDate, :couponId, :detail, 1)")
-                        .bind("name", product.getName())
-                        .bind("price", product.getPrice())
-                        .bind("productTypeId", product.getProductTypeID())
-                        .bind("producerId", product.getProducerID())
-                        .bind("quantity", product.getQuantity())
-                        .bind("status", product.getStatus())
-                        .bind("importDate", product.getImport_date())
-                        .bind("couponId", product.getCouponId())
-                        .bind("detail", product.getDetail())
-                        .execute()
-        );
-        return rowsAffected > 0;
-    }
+    // Chèn sản phẩm vào cơ sở dữ liệu và lấy ID tự động
+    return JDBIConnector.getConnect().withHandle(handle -> {
+        int rowsAffected = handle.createUpdate(sql)
+                .bind(0, product.getName())
+                .bind(1, product.getPrice())
+                .bind(2, product.getQuantity())
+                .bind(3, product.getDetail())
+                .bind(4, product.getProductTypeID())
+                .bind(5, product.getProducerID())
+                .bind(6, product.getStatus())
+                .bind(7, product.getImport_date())
+                .bind(8, product.getCouponId())
+                .execute();
+
+        // Lấy ID của sản phẩm vừa thêm (ID tự động tăng)
+        if (rowsAffected > 0) {
+            product.setId(handle.createQuery("SELECT LAST_INSERT_ID()")
+                    .mapTo(Integer.class)
+                    .findOnly());
+            return true;
+        }
+        return false;
+    });
+}
+
 
     @Override
     public boolean updateProduct(Product product) {
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
-                handle.createUpdate("UPDATE products SET name = :name, price = :price, product_type_id = :productTypeId, producer_id = :producerId, detail = :detail WHERE id = :productId")
-                        .bind("name", product.getName())
-                        .bind("price", product.getPrice())
-                        .bind("productTypeId", product.getProductType().getId())
-                        .bind("producerId", product.getProducer().getId())
-                        .bind("detail", product.getDetail())
-                        .bind("productId", product.getId())
-                        .execute()
-        );
-        return rowsAffected > 0;
+//        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+//                handle.createUpdate("UPDATE products SET name = :name, price = :price, product_type_id = :productTypeId, producer_id = :producerId, detail = :detail WHERE id = :productId")
+//                        .bind("name", product.getName())
+//                        .bind("price", product.getPrice())
+//                        .bind("productTypeId", product.getProductType().getId())
+//                        .bind("producerId", product.getProducer().getId())
+//                        .bind("detail", product.getDetail())
+//                        .bind("productId", product.getId())
+//                        .execute()
+//        );
+//        return rowsAffected > 0;
+        String sql = "UPDATE products SET name = ?, price = ?, quantity = ?, detail = ?, product_type_id = ?, producer_id = ?, status = ?, import_date = ?, coupon_id = ? WHERE id = ?";
+        return JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createUpdate(sql)
+                    .bind(0, product.getName())            // Tên sản phẩm
+                    .bind(1, product.getPrice())           // Giá sản phẩm
+                    .bind(2, product.getQuantity())        // Số lượng sản phẩm
+                    .bind(3, product.getDetail())          // Chi tiết sản phẩm
+                    .bind(4, product.getProductTypeID())   // ID loại sản phẩm
+                    .bind(5, product.getProducerID())      // ID nhà sản xuất
+                    .bind(6, product.getStatus())          // Trạng thái sản phẩm
+                    .bind(7, product.getImport_date())     // Ngày nhập hàng
+                    .bind(8, product.getCouponId())        // ID mã giảm giá (nếu có)
+                    .bind(9, product.getId())              // ID sản phẩm cần cập nhật
+                    .execute() > 0;
+        });
+
     }
 
     @Override
@@ -91,6 +135,11 @@ public class ProductDAOImpl implements IProductDAO {
                     .findFirst()
                     .orElse(null);
         });
+        if (product != null) {
+            System.out.println("Product found in DB: " + product);
+        } else {
+            System.out.println("No product found with ID: " + id);
+        }
         return product;
     }
 

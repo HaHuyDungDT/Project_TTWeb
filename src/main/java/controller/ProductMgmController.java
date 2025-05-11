@@ -1,21 +1,123 @@
 package controller;
 
-import dao.impl.ProductDAOImpl;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import model.Product;
+import service.IProductService;
+import service.impl.ProductServiceImpl;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import model.ProductType;
+import model.Producer;
 
-@WebServlet(name = "ProductMgmController", urlPatterns = {"/admin/products"})
+@WebServlet("/quanlysanpham")
 public class ProductMgmController extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Product> products = new ProductDAOImpl().findAll();
-        request.setAttribute("products", products);
-        request.getRequestDispatcher("quanlysanpham.jsp").forward(request, response);
+    private IProductService productService = new ProductServiceImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Lấy tất cả sản phẩm từ service
+        List<Product> products = productService.findAll();
+
+        // Lấy danh sách loại sản phẩm và nhà sản xuất
+        List<ProductType> productTypes = productService.getProductTypes();  // Lấy tất cả các loại sản phẩm
+        List<Producer> producers = productService.getProducers();  // Lấy tất cả các nhà sản xuất
+
+        // Truyền danh sách sản phẩm và các loại sản phẩm, nhà sản xuất vào request để hiển thị trong JSP
+        req.setAttribute("products", products);
+        req.setAttribute("productTypes", productTypes);
+        req.setAttribute("producers", producers);
+
+        // Kiểm tra thông báo thành công hoặc thất bại nếu có
+        HttpSession session = req.getSession();
+        String successMessage = (String) session.getAttribute("successMessage");
+        if (successMessage != null) {
+            req.setAttribute("successMessage", successMessage);
+            session.removeAttribute("successMessage");
+        }
+
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (errorMessage != null) {
+            req.setAttribute("errorMessage", errorMessage);
+            session.removeAttribute("errorMessage");
+        }
+
+        req.getRequestDispatcher("quanlysanpham.jsp").forward(req, resp);
+    }
+
+    // Cập nhật thông tin sản phẩm (sửa)
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Lấy thông tin từ form
+        try {
+            Integer id = Integer.parseInt(req.getParameter("id"));
+            String name = req.getParameter("name");
+            double price = Double.parseDouble(req.getParameter("price"));
+            int quantity = Integer.parseInt(req.getParameter("quantity"));
+            String detail = req.getParameter("detail");
+            String productType = req.getParameter("productType");
+            String producer = req.getParameter("producer");
+            String status = req.getParameter("status");
+
+            // Tạo đối tượng Product
+            Product product = new Product();
+            product.setId(id);
+            product.setName(name);
+            product.setPrice(price);
+            product.setQuantity(quantity);
+            product.setDetail(detail);
+
+            // Cập nhật loại sản phẩm và nhà sản xuất
+            product.setProductTypeID(Integer.parseInt(productType));
+            product.setProducerID(Integer.parseInt(producer));
+            product.setStatus(status);
+
+            boolean result = productService.updateProduct(product); // Cập nhật sản phẩm
+
+            // Lưu thông báo thành công vào session
+            if (result) {
+                HttpSession session = req.getSession();
+                session.setAttribute("successMessage", "Cập nhật sản phẩm thành công");
+            } else {
+                HttpSession session = req.getSession();
+                session.setAttribute("errorMessage", "Không thể cập nhật sản phẩm");
+            }
+
+            resp.sendRedirect("quanlysanpham");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format.");
+        }
+    }
+
+    // Xóa sản phẩm
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            // Lấy ID sản phẩm từ request
+            Integer id = Integer.parseInt(req.getParameter("id"));
+
+            // Xóa sản phẩm
+            boolean result = productService.deleteById(id);
+
+            // Lưu thông báo thành công hoặc thất bại vào session
+            if (result) {
+                HttpSession session = req.getSession();
+                session.setAttribute("successMessage", "Xóa sản phẩm thành công");
+            } else {
+                HttpSession session = req.getSession();
+                session.setAttribute("errorMessage", "Không thể xóa sản phẩm");
+            }
+
+            resp.sendRedirect("quanlysanpham");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product ID.");
+        }
     }
 }

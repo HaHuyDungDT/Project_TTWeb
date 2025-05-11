@@ -1,31 +1,40 @@
+
 package controller;
 
 import dao.impl.ProductDAOImpl;
+import service.IProductService;
+import service.impl.ProductServiceImpl;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet(name = "DeleteProductController", value = "/delete")
+@WebServlet("/quanlysanpham/product-delete")
 public class DeleteProductController extends HttpServlet {
-    private ProductDAOImpl productDAO = new ProductDAOImpl();
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private IProductService productService = new ProductServiceImpl();
 
-    }
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("utf-8");
-        response.setCharacterEncoding("utf-8");
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            Integer productId = Integer.parseInt(req.getParameter("productIdToDelete"));
+            boolean result = productService.deleteById(productId);  // Xử lý xóa sản phẩm theo ID
 
-        String id = request.getParameter("productIdToDelete");
-        if(id != null && !id.isEmpty()){
-            productDAO.deleteById(Integer.valueOf(id));
-            request.getSession().setAttribute("deleteSuccess", true);
-            response.sendRedirect("quanlysanpham.jsp");
-        }else{
-            response.sendRedirect("index.jsp");
+            if (result) {
+                req.getSession().setAttribute("deleteSuccess", true);  // Gửi thông báo thành công
+            } else {
+                req.getSession().setAttribute("deleteFailed", true);  // Thông báo lỗi
+            }
+
+            resp.sendRedirect("/quanlysanpham");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product ID.");
         }
     }
 }
+

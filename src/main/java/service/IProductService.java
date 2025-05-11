@@ -1,6 +1,8 @@
 package service;
 
+import model.Producer;
 import model.Product;
+import model.ProductType;
 
 import java.util.List;
 
@@ -21,5 +23,7 @@ public interface IProductService {
     boolean updateProduct(Product product);
     boolean insert(Product product);
 
+    List<ProductType> getProductTypes();
+    List<Producer> getProducers();
 }
 

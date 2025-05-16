@@ -6,6 +6,7 @@ import model.User;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 public class UserDaoImpl implements IUserDao {
@@ -23,8 +24,6 @@ public class UserDaoImpl implements IUserDao {
         System.out.println(user);
         try {
             int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-//                return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-
                 return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, role_id, created_at, updated_at, status, phone, birth, gender, address, secretKey, twoFaEnabled, picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .bind(0, user.getUsername())
                         .bind(1, user.getPassword())
@@ -45,13 +44,46 @@ public class UserDaoImpl implements IUserDao {
                         .bind(16, user.isTwoFaEnabled())
                         .bind(17, user.getPicture())
                         .execute();
-
             });
             return rowsAffected > 0;
         } catch (Exception e) {
             System.err.println("❌ LỖI KHI INSERT:");
-            e.printStackTrace(); // Xem lỗi SQL
-            return false; // Trả về false nếu có lỗi
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateAvatar(int idUser, String path) {
+        try {
+            int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                    handle.createUpdate("UPDATE users SET picture = ? WHERE id = ?")
+                            .bind(0, path)
+                            .bind(1, idUser)
+                            .execute()
+            );
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateInfo(int idUser, String email, String name, String phone) {
+        try {
+            int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                    handle.createUpdate("UPDATE users SET email = ?, name = ?, phone = ? WHERE id = ?")
+                            .bind(0, email)
+                            .bind(1, name)
+                            .bind(2, phone)
+                            .bind(3, idUser)
+                            .execute()
+            );
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -66,8 +98,8 @@ public class UserDaoImpl implements IUserDao {
             );
             return count > 0;
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi để debug
-            return false; // Trả về false nếu có lỗi
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -87,8 +119,8 @@ public class UserDaoImpl implements IUserDao {
                         .orElse(null);
             });
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi để debug
-            return null; // Trả về null nếu có lỗi
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -140,7 +172,6 @@ public class UserDaoImpl implements IUserDao {
         );
     }
 
-
     @Override
     public boolean isEmailExists(String email) {
         try {
@@ -152,8 +183,8 @@ public class UserDaoImpl implements IUserDao {
             );
             return count > 0;
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi để debug
-            return false; // Trả về false nếu có lỗi
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -213,7 +244,6 @@ public class UserDaoImpl implements IUserDao {
         }
     }
 
-
     @Override
     public User isUserExists(String oauthProvider, String oauthUid) {
         User user = JDBIConnector.getConnect().withHandle(handle -> {
@@ -245,7 +275,6 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public boolean addGoogleUser(User user) {
         int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            // Cập nhật câu lệnh INSERT để thêm giá trị cho cột picture
             return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                     .bind(0, user.getUsername())
                     .bind(1, user.getPassword())
@@ -263,13 +292,12 @@ public class UserDaoImpl implements IUserDao {
         });
         return rowsAffected > 0;
     }
+
     @Override
     public boolean addFacebookUser(User user) {
         try {
-            // Kiểm tra xem người dùng với oauth_uid đã tồn tại chưa
             User existingUser = getByOAuthUser(user.getOauthUid());
             if (existingUser != null) {
-                // Nếu đã tồn tại, cập nhật lại thông tin mới (oauthToken, name, email, picture, updated_at)
                 int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
                     return handle.createUpdate("UPDATE users SET oauth_token = ?, name = ?, email = ?, picture = ?, updated_at = ? WHERE id = ?")
                             .bind(0, user.getOauthToken())
@@ -282,7 +310,6 @@ public class UserDaoImpl implements IUserDao {
                 });
                 return rowsAffected > 0;
             } else {
-                // Nếu chưa tồn tại, tiến hành INSERT bản ghi mới
                 int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
                     return handle.createUpdate("INSERT INTO users(username, password, oauth_provider, oauth_uid, oauth_token, name, email, picture, role_id, created_at, updated_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                             .bind(0, user.getUsername())
@@ -307,4 +334,53 @@ public class UserDaoImpl implements IUserDao {
         }
     }
 
+    @Override
+    public boolean updateProfile(int id,
+                                 String username,
+                                 String name,
+                                 String email,
+                                 String phone,
+                                 String gender,
+                                 LocalDate birth) {
+        try {
+            String sql = "UPDATE users " +
+                    "SET username = ?, name = ?, email = ?, phone = ?, gender = ?, birth = ?, updated_at = ? " +
+                    "WHERE id = ?";
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                    handle.createUpdate(sql)
+                            .bind(0, username)
+                            .bind(1, name)
+                            .bind(2, email)
+                            .bind(3, phone)
+                            .bind(4, gender)
+                            .bind(5, Date.valueOf(birth))
+                            .bind(6, now)
+                            .bind(7, id)
+                            .execute()
+            );
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Hàm updateAddress duy nhất sử dụng userId và các thành phần địa chỉ
+    @Override
+    public boolean updateAddress(int userId, String province, String city, String commune, String street) {
+        try {
+            String fullAddress = province + ", " + city + ", " + commune + ", " + street;
+            int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                    handle.createUpdate("UPDATE users SET address = ? WHERE id = ?")
+                            .bind(0, fullAddress)
+                            .bind(1, userId)
+                            .execute()
+            );
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

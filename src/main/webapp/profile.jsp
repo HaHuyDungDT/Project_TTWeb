@@ -2,6 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page import="java.time.LocalDate" %>
+<%
+    int currentYear = LocalDate.now().getYear();
+    request.setAttribute("currentYear", currentYear);
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,6 +214,30 @@
             display: block;
             margin: 0 auto;
         }
+
+        #uploadBtn {
+            margin-top: 10px;
+            background: linear-gradient(45deg, #ff5722, #ff5722);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+            transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        #uploadBtn:hover {
+            background: linear-gradient(45deg, #ff5722, #ff5722);
+            transform: scale(1.05);
+            box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+        }
+
+        #uploadBtn:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -236,7 +265,7 @@
         <ul>
             <li><a href="#"><i class="fas fa-file-alt"></i> Đơn Mua</a></li>
             <li><a href="#"><i class="fas fa-gift"></i> Kho Voucher</a></li>
-            <li><a href="#"><i class="fas fa-coins"></i> Shopee Xu</a></li>
+            <li><a href="#"><i class="fas fa-coins"></i> Phukienphone Xu</a></li>
             <li><a href="#"><i class="fas fa-star"></i> Siêu Hội Freeship</a></li>
         </ul>
         <div class="section-title"><i class="fas fa-ellipsis-h"></i> Khác</div>
@@ -263,59 +292,56 @@
 
         <div class="row">
             <div class="col-md-8">
-                <form action="updateProfile" method="post">
+                <form id="profileForm"
+                      action="${pageContext.request.contextPath}/api/profile/update"
+                      method="post"
+                      enctype="multipart/form-data"
+                      accept-charset="UTF-8">
                     <div class="form-group">
                         <label class="form-label">OAuth User ID</label>
-                        <input type="text" name="id" value="${user.oauthUid}" readonly>
+                        <input type="text" name="id" value="${user.oauthUid}" readonly />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tên đăng nhập</label>
-                        <input type="text" name="username" value="${user.username}" readonly>
+                        <input type="text" name="username" value="${user.username}" readonly />
                         <small>Tên đăng nhập chỉ có thể thay đổi một lần.</small>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tên</label>
-                        <input type="text" name="name" placeholder="Nhập tên của bạn" value="${user.name}">
+                        <input id="nameInput"
+                               type="text"
+                               name="name"
+                               placeholder="Nhập tên của bạn"
+                               value="${user.name}"
+                               class="form-control" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" value="${user.email}" readonly>
-                        <a href="#" style="color: blue;">Thay Đổi</a>
+                        <input id="emailInput" type="email" name="email" value="${user.email}" readonly />
+                        <button id="changeEmailBtn" type="button" style="color: blue; background:none; border:none; cursor:pointer;">Thay Đổi</button>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Số điện thoại</label>
-                        <input type="text" name="phone" placeholder="Số điện thoại (nếu có)" value="">
+                        <input id="phoneInput"
+                               type="text"
+                               name="phone"
+                               class="form-control"
+                               value="${user.phone}" />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Giới tính</label>
                         <div>
-                            <label><input type="radio" name="gender" value="Nam"> Nam</label>
-                            <label style="margin-left: 20px;"><input type="radio" name="gender" value="Nữ"> Nữ</label>
+                            <label>
+                                <input type="radio" name="gender" value="Nam"
+                                       <c:if test="${user.gender == 'Nam'}">checked</c:if> /> Nam
+                            </label>
+                            <label style="margin-left:20px">
+                                <input type="radio" name="gender" value="Nữ"
+                                       <c:if test="${user.gender == 'Nữ'}">checked</c:if> /> Nữ
+                            </label>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Ngày sinh</label>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <select class="form-control">
-                                    <option>Ngày</option>
-                                    <!-- Option ngày... -->
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <select class="form-control">
-                                    <option>Tháng</option>
-                                    <!-- Option tháng... -->
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <select class="form-control">
-                                    <option>Năm</option>
-                                    <!-- Option năm... -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- ... -->
                     <button type="submit" class="save-button">Lưu</button>
                 </form>
             </div>
@@ -333,13 +359,10 @@
                             </div>
                         </c:otherwise>
                     </c:choose>
-                    <div class="avatar-upload" style="margin-top: 20px;">
-                        <button type="button">Chọn Ảnh</button>
-                        <p style="margin-top:10px;">
-                            Dung lượng file tối đa: 1 MB<br>
-                            Dạng file: JPEG, PNG
-                        </p>
-                    </div>
+                    <form id="uploadForm" enctype="multipart/form-data" method="post" action="api/avatar/upload">
+                        <input type="file" name="avatar" id="avatarInput" accept="image/jpeg, image/png" style="display: none">
+                        <button type="button" id="uploadBtn">⬆ Chọn Ảnh</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -349,7 +372,49 @@
 <!-- FOOTER -->
 <jsp:include page="footer.jsp"/>
 <!-- /FOOTER -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#profileForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = this, data = new FormData(form);
+        $.ajax({
+            url: $(form).attr('action'),
+            method: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            headers: {'X-Requested-With':'XMLHttpRequest'},
+            success: function(res) {
+                if (res.ok) {
+                    // cập nhật Name, Phone, Gender
+                    $('#nameInput').val(res.name);
+                    $('#phoneInput').val(res.phone);
+                    $('input[name=gender][value="' + res.gender + '"]').prop('checked', true);
+                    Toastify({ text: "Cập nhật thành công", className: "success" }).showToast();
+                } else {
+                    Toastify({ text: "Cập nhật thất bại", className: "error" }).showToast();
+                }
+            },
+            error: function() {
+                Toastify({ text: "Lỗi server", className: "error" }).showToast();
+            }
+        });
+    });
+</script>
+<script>
+    // Khi nhấn nút Upload Profile thì mở hộp chọn file
+    document.getElementById("uploadBtn").addEventListener("click", function(){
+        document.getElementById("avatarInput").click();
+    });
 
+    // Khi chọn file, tự động submit form
+    document.getElementById("avatarInput").addEventListener("change", function(){
+        if(this.files.length > 0) {
+            document.getElementById("uploadForm").submit();
+        }
+    });
+
+</script>
 <script src="js/main.js"></script>
 </body>
 </html>

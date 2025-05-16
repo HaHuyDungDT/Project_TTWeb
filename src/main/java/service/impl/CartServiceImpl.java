@@ -8,6 +8,7 @@ import dao.impl.CartDAOImpl;
 import dao.impl.CartItemDAOImpl;
 import dao.impl.ImageDAOImpl;
 import dao.impl.ProductDAOImpl;
+import db.JDBIConnector;
 import model.CartResponse;
 import model.Image;
 import model.Product;
@@ -88,4 +89,15 @@ public class CartServiceImpl implements ICartService {
         return  cartItemDAO.removeCartItem(productId, cartId);
     }
 
+    @Override
+    public int createCartForUser(int userId) {
+        // insert vào bảng carts(user_id) và trả về id auto-generated
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createUpdate("INSERT INTO carts(user_id) VALUES(:u)")
+                        .bind("u", userId)
+                        .executeAndReturnGeneratedKeys("id")
+                        .mapTo(int.class)
+                        .one()
+        );
+    }
 }

@@ -10,9 +10,7 @@ import utils.SessionUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -20,49 +18,54 @@ import java.util.UUID;
 public class AddCartItemRestController extends HttpServlet {
     private ICartService cartService = new CartServiceImpl();
 
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-    }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        String id = request.getParameter("productId");
-        Integer productId = Integer.parseInt(request.getParameter("productId"));
+
+        // 1) Kiểm tra login
         User user = (User) SessionUtil.getInstance().getKey(request, "user");
-
-
-        if(user == null) {
-            response.setStatus(400);
-            response.getWriter().print("Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng!");
+        if (user == null) {
+            response.setStatus(401);
+            JsonObject err = new JsonObject();
+            err.addProperty("error", "Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng!");
+            response.getWriter().print(err.toString());
             return;
         }
 
-        Integer userId = user.getId();
-        Cart cartId = cartService.findByUserId(userId);
+        int userId = user.getId();
+        int productId = Integer.parseInt(request.getParameter("productId"));
 
-        if (userId != null && cartId != null) {
-            CartItem cartItem = new CartItem();
-            cartItem.setId(UUID.randomUUID().toString());
-            cartItem.setCartId(cartId.getId());
-            cartItem.setProductId(productId);
-            cartItem.setQuantity(1);
-            cartService.addCartItem(cartItem);
+        // 2) Lấy hoặc tạo Cart cho user
+        Cart cart = cartService.findByUserId(userId);
+        if (cart == null) {
+            // tạo mới và lấy id
+            int newCartId = cartService.createCartForUser(userId);
+            cart = new Cart();
+            cart.setId(newCartId);
+            cart.setUserId(userId);
+            // lưu vào session để tái sử dụng
+            HttpSession session = request.getSession();
+            session.setAttribute("cart", cart);
         }
 
-        assert cartId != null;
-        Integer totalItem = cartService.getTotalCartItem(cartId.getId());
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("status", "Thêm vào giỏ hàng thành công");
-        jsonObject.addProperty("code", 202);
-        jsonObject.addProperty("message", totalItem);
-        response.setStatus(202);
-        response.getWriter().print(jsonObject);
+        // 3) Thêm CartItem
+        CartItem item = new CartItem();
+        item.setId(UUID.randomUUID().toString());
+        item.setCartId(cart.getId());
+        item.setProductId(productId);
+        item.setQuantity(1);
+        cartService.addCartItem(item);
+
+        // 4) Trả về tổng số items trong giỏ
+        int totalItem = cartService.getTotalCartItem(cart.getId());
+        JsonObject resp = new JsonObject();
+        resp.addProperty("status", "Thêm vào giỏ hàng thành công");
+        resp.addProperty("totalItems", totalItem);
+
+        response.setStatus(200);
+        response.getWriter().print(resp.toString());
     }
 }
-

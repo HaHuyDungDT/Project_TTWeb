@@ -16,4 +16,6 @@ public interface ICartService {
     Integer getTotalCartItem(Integer cartId);
     List<CartResponse> getCartItemByCartId(Integer cartId);
     boolean removeCartItem(Integer productId, Integer cartId);
+
+    int createCartForUser(int userId);
 }

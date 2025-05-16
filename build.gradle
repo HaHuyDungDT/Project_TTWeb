@@ -51,6 +51,8 @@ dependencies {
     // JSON
     implementation 'org.json:json:20200518'
 
+    implementation("com.cloudinary:cloudinary-http44:1.33.0")
+
     // Google APIs
     implementation 'com.google.http-client:google-http-client-gson:1.42.3'
     implementation 'com.google.api-client:google-api-client:2.7.2'

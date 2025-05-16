@@ -32,4 +32,14 @@ public class User {
     @Nullable private String secretKey;
     private boolean twoFaEnabled;
     @Nullable private String picture;
+
+    public int getBirthDay() {
+        return birth != null? birth.getDayOfMonth(): 0;
+    }
+    public int getBirthMonth() {
+        return birth != null? birth.getMonthValue(): 0;
+    }
+    public int getBirthYear() {
+        return birth != null? birth.getYear(): 0;
+    }
 }

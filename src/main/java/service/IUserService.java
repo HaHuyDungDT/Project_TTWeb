@@ -18,6 +18,9 @@ public interface IUserService {
     boolean add(User user);
     boolean addGoogleUser(User newUser);
     User getByOAuthUser(String id);
+
+    void updateInfo(Integer id, String newEmail, String name, String phone);
+
     String createId(); // Có thể bỏ nếu bạn đã dùng auto_increment
     boolean isUserLocked(String username);
     boolean addFacebookUser(User newUser);

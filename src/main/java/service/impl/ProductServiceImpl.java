@@ -197,6 +197,16 @@ public class ProductServiceImpl implements IProductService {
     public boolean insert(Product product) {
         return productDAO.addProduct(product);
     }
+
+    @Override
+    public List<ProductType> getProductTypes() {
+        return productTypeDAO.findAll();
+    }
+
+    @Override
+    public List<Producer> getProducers() {
+        return producerDAO.findAll(); // hoặc trả về danh sách Producer theo logic cụ thể
+    }
 }
 
 

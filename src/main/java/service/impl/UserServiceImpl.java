@@ -190,6 +190,21 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public void updateInfo(Integer id, String newEmail, String name, String phone) {
+        try {
+            boolean ok = userDao.updateInfo(id, newEmail, name, phone);
+            if (!ok) {
+                // Không cập nhật được, có thể throw exception hoặc log
+                throw new RuntimeException("Cập nhật thông tin thất bại cho user id=" + id);
+            }
+        } catch (Exception e) {
+            // Ghi log lỗi và rethrow nếu cần
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
     public String createId() {
         return UUID.randomUUID().toString();
     }

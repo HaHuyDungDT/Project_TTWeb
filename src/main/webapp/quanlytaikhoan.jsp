@@ -7,8 +7,9 @@
 <%@ page import="service.impl.UserServiceImpl" %>
 <%
     // Kiểm tra đăng nhập và phân quyền (chỉ admin mới được vào trang này)
-    if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || 
-       new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 1) {
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    if(userId == null ||
+            (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1)){
         response.sendRedirect("dangnhap.jsp");
     }
 %>

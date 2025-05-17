@@ -9,7 +9,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <%
-    if (SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRole_idStr().equals("0")) {
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin mới được vào trang này)
+    if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || 
+       new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 1) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>

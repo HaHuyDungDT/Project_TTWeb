@@ -1,10 +1,20 @@
-
 <%@ page import="Model.Order" %>
 <%@ page import="java.util.List" %>
 <%@ page import="Model.User" %>
 <%@ page import="DAO.UserDAO" %>
 <%@ page import="DAO.OrderDAO" %>
+<%@ page import="service.impl.UserServiceImpl" %>
+<%@ page import="utils.SessionUtil" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
+    if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || 
+       (new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 1 &&
+        new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 2)) {
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head lang="en">

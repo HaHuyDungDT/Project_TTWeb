@@ -7,6 +7,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="service.impl.UserServiceImpl" %>
+<%@ page import="utils.SessionUtil" %>
+<%
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
+    if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || 
+       (new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 1 &&
+        new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRoleId() != 2)) {
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 
 <!DOCTYPE html>
 <html>

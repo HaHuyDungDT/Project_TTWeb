@@ -90,7 +90,7 @@ public class LoginController extends HttpServlet {
                 session.setAttribute("loginFailures", 0);
                 session.removeAttribute("rapidAttempts");
                 session.removeAttribute("lastAttempt");
-                if (loggedInUser.getRoleId() == 1) {
+                if (loggedInUser.getRoleId() == 1 || loggedInUser.getRoleId() == 2) {
                     resp.sendRedirect("admin.jsp");
                 } else {
                     resp.sendRedirect("index.jsp");

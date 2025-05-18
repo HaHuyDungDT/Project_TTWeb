@@ -3,7 +3,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    if(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user") == null || new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getRole_idStr().equals("0")){
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    if(userId == null ||
+            (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1 &&
+                    new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
@@ -88,6 +92,8 @@
                 <span>Thông số bán hàng</span>
             </a>
         </li>
+        
+        <c:if test="${sessionScope.user.roleId == 1}">
         <li class="sidebar-nav-item">
             <a href="admin.jsp" class="sidebar-nav-link">
                 <div>
@@ -96,6 +102,8 @@
                 <span>Quản lý nhân viên</span>
             </a>
         </li>
+        </c:if>
+        
         <li class="sidebar-nav-item">
             <a href="quanlysanpham.jsp" class="sidebar-nav-link">
                 <div>
@@ -104,6 +112,7 @@
                 <span>Quản lý sản phẩm</span>
             </a>
         </li>
+        
         <li class="sidebar-nav-item">
             <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
                 <div>
@@ -112,6 +121,8 @@
                 <span>Quản lý hóa đơn</span>
             </a>
         </li>
+        
+        <c:if test="${sessionScope.user.roleId == 1}">
         <li class="sidebar-nav-item">
             <a href="quanlytaikhoan" class="sidebar-nav-link">
                 <div>
@@ -120,6 +131,7 @@
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
+        </c:if>
     </ul>
 </div>
 <!-- end sidebar -->

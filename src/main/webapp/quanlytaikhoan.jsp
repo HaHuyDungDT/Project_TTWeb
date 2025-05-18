@@ -4,13 +4,15 @@
 <%@ page import="utils.SessionUtil" %>
 <%@ page import="model.User" %>
 <%@ page import="dao.impl.UserDaoImpl" %>
-<%--<%--%>
-<%--    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");--%>
-<%--    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;--%>
-<%--    if (currentUser == null || "0".equals(currentUser.getRoleId())) {--%>
-<%--        response.sendRedirect("dangnhap.jsp");--%>
-<%--    }--%>
-<%--%>--%>
+<%@ page import="service.impl.UserServiceImpl" %>
+<%
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin mới được vào trang này)
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    if(userId == null ||
+            (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1)){
+        response.sendRedirect("dangnhap.jsp");
+    }
+%>
 
 <!DOCTYPE html>
 <html>
@@ -363,7 +365,8 @@
                         <label>Quyền</label>
                         <select class="form-control" required name="role" id="addRole">
                             <option value="1">Admin</option>
-                            <option value="2">Khách hàng</option>
+                            <option value="2">Mod</option>
+                            <option value="3">User</option>
                         </select>
                     </div>
                     <div class="form-group">

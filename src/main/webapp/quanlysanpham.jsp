@@ -9,12 +9,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="service.impl.UserServiceImpl" %>
 <%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
 <%
     // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
     if(userId == null || 
-       (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1 &&
-        new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 2)) {
+       (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>

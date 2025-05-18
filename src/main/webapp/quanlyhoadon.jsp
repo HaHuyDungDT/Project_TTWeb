@@ -9,10 +9,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    if(userId == null || 
-       (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1 &&
-        new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 2)) {
+    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    if(userId == null ||
+       (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
@@ -60,9 +59,11 @@
     <ul class="navbar-nav nav-right">
         <li class="nav-item">
             <div class="avt dropdown">
-                <c:if test="${sessionScope.user != null}">
-                    <a><i class="fa fa-user-o"></i> <%= new userServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
-                </c:if>
+                <%
+                    User user = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+                %>
+                <a><i class="fa fa-user-o"></i> <%= user.getName() %></a>
+
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
                         <a href="logout" class="dropdown-menu-link">
@@ -162,8 +163,8 @@
                         </thead>
                         <tbody>
                         <%
-                            OrderDAO orderDAO = new OrderDAO();
-                            List<Order> list = orderDAO.selectAll();
+                            OrderDAOImpl orderDAO = new OrderDAOImpl();
+                            List<Order> list = orderDAO.findAll();
                             for (Order order : list) {
                         %>
                         <tr>
@@ -175,7 +176,7 @@
                             </td>
                             <td><%=order.getStatus()%>
                             </td>
-                            <td><%=order.getPayMent()%>
+                            <td><%=order.getPayment_method()%>
                             </td>
                             <td><%=order.getOrderDate()%>
                             </td>
@@ -212,7 +213,7 @@
                             <label>Mã khách hàng</label>
                             <select name="userId" class="form-control" required>
                                 <option value="" disabled selected>Chọn mã khách hàng</option>
-                                <% List<User> u1 = new UserDAO().selectAll();
+                                <% List<User> u1 = new UserDaoImpl().findAll();
                                     for (User user : u1) {%>
                                 <option value="<%= user.getId() %>"><%= user.getId() %></option>
                                 <%
@@ -277,7 +278,7 @@
                             <label>Mã khách hàng</label>
                                 <select name="userId" class="form-control" required>
                                     <option value="" disabled selected>Chọn mã khách hàng</option>
-                                <% List<User> u = new UserDAO().selectAll();
+                                <% List<User> u = new UserDaoImpl().findAll();
                                     for (User user : u) {%>
                                     <option value="<%= user.getId() %>"><%= user.getId() %></option>
                                 <%

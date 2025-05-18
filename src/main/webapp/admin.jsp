@@ -1,13 +1,13 @@
 <%@ page import="service.impl.UserServiceImpl" %>
 <%@ page import="utils.SessionUtil" %>
+<%@ page import="model.User" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
     if(userId == null ||
-            (new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 1 &&
-                    new UserServiceImpl().getById(Integer.parseInt(userId)).getRoleId() != 2)) {
+            (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
@@ -55,9 +55,10 @@
     <ul class="navbar-nav nav-right">
         <li class="nav-item">
             <div class="avt dropdown">
-                <c:if test="${sessionScope.user != null}">
-                    <a><i class="fa fa-user-o"></i> <%= new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
-                </c:if>
+                <%
+                    User user = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+                %>
+                <a><i class="fa fa-user-o"></i> <%= user.getName() %></a>
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
                         <a href="logout" class="dropdown-menu-link">

@@ -40,36 +40,39 @@ public class ProductTypeDAOImpl implements IProductTypeDAO {
 
     @Override
     public boolean save(ProductType productType) {
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("INSERT INTO product_type (name, code) VALUES (:name, :code)")
-                    .bind("name", productType.getName())
-                    .bind("code", productType.getCode())
-                    .execute();
-        });
+        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createUpdate(
+                                "INSERT INTO product_types(name, code) VALUES(:name, :code)")
+                        .bind("name", productType.getName())
+                        .bind("code", productType.getCode())
+                        .execute()
+        );
         return rowsAffected > 0;
     }
 
     @Override
     public boolean update(ProductType productType) {
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("UPDATE product_type SET name = :name, code = :code WHERE id = :id")
-                    .bind("name", productType.getName())
-                    .bind("code", productType.getCode())
-                    .execute();
-        });
+        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createUpdate(
+                                "UPDATE product_types SET name = :name, code = :code WHERE id = :id")
+                        .bind("name", productType.getName())
+                        .bind("code", productType.getCode())
+                        .bind("id", productType.getId())
+                        .execute()
+        );
         return rowsAffected > 0;
     }
 
     @Override
     public boolean delete(Integer productTypeId) {
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("Delete from product_type WHERE id = :id")
-                    .bind("id", productTypeId)
-                    .execute();
-        });
+        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createUpdate(
+                                "DELETE FROM product_types WHERE id = :id")
+                        .bind("id", productTypeId)
+                        .execute()
+        );
         return rowsAffected > 0;
     }
 
-
-
 }
+

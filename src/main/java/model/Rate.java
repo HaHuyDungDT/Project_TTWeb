@@ -14,4 +14,5 @@ public class Rate {
     private Integer star;
     private String comment;
     private Integer productId;
+    private Integer userId;
 }

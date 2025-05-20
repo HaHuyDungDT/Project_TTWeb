@@ -69,12 +69,14 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Product findProductById(int id) {
         Product product = productDAO.findById(id);
-        List<Image> images = imageDAO.findByProductId(id);
-        ProductType productType = productTypeDAO.findById(product.getId());
-        Producer producer = producerDAO.findById(product.getId());
-        product.setProductType(productType);
-        product.setProducer(producer);
-        product.setImages(images);
+        if (product != null) {
+            List<Image> images = imageDAO.findByProductId(id);
+            ProductType productType = productTypeDAO.findById(product.getProductTypeID());
+            Producer producer = producerDAO.findById(product.getProducerID());
+            product.setProductType(productType);
+            product.setProducer(producer);
+            product.setImages(images);
+        }
         return product;
     }
 
@@ -133,8 +135,8 @@ public class ProductServiceImpl implements IProductService {
         List<Product> products = productDAO.getPaging(index);
         for (Product product : products) {
             List<Image> images = imageDAO.findByProductId(product.getId());
-            ProductType productType = productTypeDAO.findById(product.getProductType().getId());
-            Producer producer = producerDAO.findById(product.getProducer().getId());
+            ProductType productType = productTypeDAO.findById(product.getProductTypeID());
+            Producer producer = producerDAO.findById(product.getProducerID());
             product.setImages(images);
             product.setProductType(productType);
             product.setProducer(producer);

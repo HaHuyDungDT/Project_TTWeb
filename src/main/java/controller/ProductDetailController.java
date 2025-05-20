@@ -2,6 +2,7 @@ package controller;
 
 import model.Log;
 import model.Product;
+import model.Rate;
 import model.User;
 import service.ILogService;
 import service.IProductService;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(value = "/product")
 public class ProductDetailController extends HttpServlet {
@@ -29,23 +31,35 @@ public class ProductDetailController extends HttpServlet {
         Integer productId = Integer.parseInt(req.getParameter("id"));
         Product product = productService.findProductById(productId);
         User user = (User) SessionUtil.getInstance().getKey(req, "user");
-        if (user == null) {
-            Log log = new Log();
-            log.setUserId(0);
-            log.setAction("Xem chi tiết sản phẩm: " + product.getName());
-            log.setAddressIP(req.getRemoteAddr());
-            log.setLevel(LevelLog.INFO);
-            logService.save(log);
-        } else {
-            Log log = new Log();
-            log.setUserId(user.getId());
-            log.setAction("Xem chi tiết sản phẩm: " + product.getName());
-            log.setAddressIP(req.getRemoteAddr());
-            log.setLevel(LevelLog.INFO);
-            logService.save(log);
-        }
+        
+        // Log việc xem sản phẩm
+        logProductView(req, resp, product, user);
+
+        // Lấy sản phẩm liên quan
+        List<Product> relatedProducts = getRelatedProducts(product);
+
+
         req.setAttribute("product", product);
+        req.setAttribute("relatedProducts", relatedProducts);
         req.getRequestDispatcher("sanpham.jsp").forward(req, resp);
+    }
+
+    private void logProductView(HttpServletRequest req, HttpServletResponse resp, Product product, User user) {
+        Log log = new Log();
+        log.setUserId(user != null ? user.getId() : 0);
+        log.setAction("Xem chi tiết sản phẩm: " + product.getName());
+        log.setAddressIP(req.getRemoteAddr());
+        log.setLevel(LevelLog.INFO);
+        logService.save(log);
+    }
+
+    private List<Product> getRelatedProducts(Product product) {
+        List<Product> relatedProducts = productService.findByCategory(product.getProductTypeID());
+        relatedProducts.removeIf(p -> p.getId().equals(product.getId()));
+        if (relatedProducts.size() > 4) {
+            relatedProducts = relatedProducts.subList(0, 4);
+        }
+        return relatedProducts;
     }
 
     @Override

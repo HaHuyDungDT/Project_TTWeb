@@ -1,8 +1,7 @@
-<%@ page import="model.Product" %>
-<%@ page import="dao.impl.ProductDAOImpl" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,9 +41,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-
-    <jsp:useBean id="a" class="service.impl.ProductServiceImpl" scope="request"/>
-
+    <jsp:useBean id="productService" class="service.impl.ProductServiceImpl" scope="request"/>
+    <jsp:useBean id="userService" class="service.impl.UserServiceImpl" scope="request"/>
 </head>
 <body>
 <!-- HEADER -->
@@ -108,7 +106,6 @@
             <div class="col-md-5">
                 <div class="product-details">
                     <h2 class="product-name">${product.name}</h2>
-                    </h2>
                     <div>
                         <fmt:formatNumber value="${product.price}" type="number" pattern="#,##0" var="formattedPrice"/>
                         <h3 class="product-price">${formattedPrice} VNĐ</h3>
@@ -126,6 +123,136 @@
                 </div>
             </div>
             <!-- /Product details -->
+            
+            <!-- Product Rating Section -->
+            <div class="col-md-12">
+                <div class="product-rating-section">
+                    <h3 class="rating-title">Đánh giá sản phẩm</h3>
+                    
+                    <div class="row">
+                        <!-- Rating Overview -->
+                        <div class="col-md-3">
+                            <div id="rating">
+                                <div class="rating-avg">
+                                    <c:set var="avg" value="${ratingService.getAverageRating(product.id)}"/>
+                                    <c:set var="fullStars" value="${fn:substringBefore(avg, '.')}" />
+                                    <c:set var="decimal" value="${avg - fullStars}" />
+                                    <c:set var="halfStar" value="${decimal >= 0.25 && decimal < 0.75 ? 1 : 0}" />
+                                    <c:set var="emptyStars" value="${5 - fullStars - halfStar}" />
+                                    <div class="rating-stars">
+                                        <c:forEach begin="1" end="${fullStars}" var="i">
+                                            <i class="fa fa-star text-warning"></i>
+                                        </c:forEach>
+                                        <c:if test="${halfStar == 1}">
+                                            <i class="fa fa-star-half-stroke text-warning"></i>
+                                        </c:if>
+                                        <c:forEach begin="1" end="${emptyStars}" var="i">
+                                            <i class="fa fa-star-o text-muted"></i>
+                                        </c:forEach>
+                                    </div>
+                                </div>
+                                <c:set var="stars" value="${fn:split('5,4,3,2,1', ',')}" />
+                                <ul class="rating">
+                                    <c:forEach var="star" items="${stars}">
+                                        <li>
+                                            <div class="rating-stars">
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="fa ${i <= star ? 'fa-star text-warning' : 'fa-star-o text-muted'}"></i>
+                                                </c:forEach>
+                                            </div>
+                                            <div class="rating-progress">
+                                                <c:set var="totalRatings" value="${ratingService.getRatingCount(product.id)}"/>
+                                                <c:set var="starRatings" value="${ratingService.getRatingCountByStar(product.id, star)}"/>
+                                                <div style="width: ${totalRatings > 0 ? (starRatings * 100 / totalRatings) : 0}%;"></div>
+                                            </div>
+                                            <span class="sum">${starRatings}</span>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- /Rating Overview -->
+
+                        <!-- Rating List -->
+                        <div class="col-md-6">
+                            <div id="reviews">
+                                <ul class="reviews">
+                                    <c:forEach var="rating" items="${ratingService.findByProductId(product.id)}">
+                                        <li>
+                                            <div class="review-heading">
+                                                <h5 class="name">
+                                                    <c:choose>
+                                                        <c:when test="${not empty rating.userId}">
+                                                            Khách hàng #${rating.userId}
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            Khách hàng
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </h5>
+                                                <p class="date">
+                                                    <fmt:formatDate value="<%= new java.util.Date() %>" pattern="dd/MM/yyyy"/>
+                                                </p>
+                                                <div class="review-rating">
+                                                    <c:forEach begin="1" end="5" var="i">
+                                                        <i class="${i <= rating.star ? 'fa-solid fa-star text-warning' : 'fa-regular fa-star text-muted'}"></i>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+                                            <div class="review-body">
+                                                <p>${rating.comment}</p>
+                                            </div>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- /Rating List -->
+
+                        <!-- Review Form -->
+                        <div class="col-md-3">
+                            <div class="review-form">
+                                <h3>Viết đánh giá của bạn</h3>
+                                <c:if test="${sessionScope.user != null}">
+                                    <c:if test="${ratingService.hasUserPurchasedProduct(sessionScope.user.id, product.id)}">
+                                        <c:if test="${!ratingService.hasUserRated(sessionScope.user.id, product.id)}">
+                                            <form action="rating" method="post">
+                                                <input type="hidden" name="productId" value="${product.id}">
+                                                <div class="rating-input">
+                                                    <label>Đánh giá của bạn:</label>
+                                                    <div class="stars">
+                                                        <c:forEach begin="1" end="5" var="star">
+                                                            <input type="radio" id="star${star}" name="star" value="${star}" required>
+                                                            <label for="star${star}"><i class="fas fa-star"></i></label>
+                                                        </c:forEach>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="comment">Nhận xét của bạn:</label>
+                                                    <textarea id="comment" name="comment" rows="4" required></textarea>
+                                                </div>
+                                                <button type="submit" class="btn-submit">Gửi đánh giá</button>
+                                            </form>
+                                        </c:if>
+                                        <c:if test="${ratingService.hasUserRated(sessionScope.user.id, product.id)}">
+                                            <p class="already-rated">Bạn đã đánh giá sản phẩm này.</p>
+                                        </c:if>
+                                    </c:if>
+                                    <c:if test="${!ratingService.hasUserPurchasedProduct(sessionScope.user.id, product.id)}">
+                                        <p class="purchase-required">Bạn cần mua sản phẩm này để có thể đánh giá.</p>
+                                    </c:if>
+                                </c:if>
+                                <c:if test="${sessionScope.user == null}">
+                                    <p class="login-required">Vui lòng <a href="login">đăng nhập</a> để đánh giá sản phẩm.</p>
+                                </c:if>
+                            </div>
+                        </div>
+                        <!-- /Review Form -->
+                    </div>
+                </div>
+            </div>
+            <!-- /Product Rating Section -->
+            
             <!-- /product tab -->
         </div>
         <!-- /row -->
@@ -133,68 +260,6 @@
     <!-- /container -->
 </div>
 <!-- /SECTION -->
-
-<style>
-.product-ratings {
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.rating-summary {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.rating-score {
-    font-size: 24px;
-    margin: 10px 0;
-}
-
-.rating-score .average {
-    font-size: 36px;
-    font-weight: bold;
-    color: #ffc107;
-}
-
-.stars {
-    margin: 10px 0;
-}
-
-.star-rating {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-}
-
-.star-rating input {
-    display: none;
-}
-
-.star-rating label {
-    cursor: pointer;
-    font-size: 25px;
-    color: #ddd;
-    margin: 0 2px;
-}
-
-.star-rating input:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-    color: #ffc107;
-}
-
-.review-item {
-    border-bottom: 1px solid #dee2e6;
-    padding: 15px 0;
-}
-
-.review-content {
-    margin-top: 10px;
-    color: #212529;
-}
-</style>
-
 <!-- SECTION - RECOMMENDED PRODUCTS -->
 <div class="section">
     <!-- container -->

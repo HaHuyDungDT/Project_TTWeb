@@ -326,4 +326,22 @@ $(document).ready(function () {
 	$('#ward-select').select2();
 });
 
+// Star Rating Interaction
+$(document).ready(function() {
+    $('.star-rating label').hover(
+        function() {
+            $(this).prevAll('label').addClass('hover');
+        },
+        function() {
+            $(this).prevAll('label').removeClass('hover');
+        }
+    );
+
+    $('.star-rating input').change(function() {
+        var rating = $(this).val();
+        $('.star-rating label').removeClass('selected');
+        $(this).next('label').addClass('selected').prevAll('label').addClass('selected');
+    });
+});
+
 

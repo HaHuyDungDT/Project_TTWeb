@@ -6,8 +6,12 @@ import model.Rate;
 import model.User;
 import service.ILogService;
 import service.IProductService;
+import service.IRatingService;
+import service.IUserService;
 import service.impl.LogServiceImpl;
 import service.impl.ProductServiceImpl;
+import service.impl.RatingServiceImpl;
+import service.impl.UserServiceImpl;
 import utils.LevelLog;
 import utils.SessionUtil;
 
@@ -23,25 +27,57 @@ import java.util.List;
 public class ProductDetailController extends HttpServlet {
     private IProductService productService = new ProductServiceImpl();
     private ILogService logService = new LogServiceImpl();
+    private IRatingService ratingService = new RatingServiceImpl();
+    private IUserService userService = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
-        Integer productId = Integer.parseInt(req.getParameter("id"));
-        Product product = productService.findProductById(productId);
-        User user = (User) SessionUtil.getInstance().getKey(req, "user");
         
-        // Log việc xem sản phẩm
-        logProductView(req, resp, product, user);
+        try {
+            String productIdParam = req.getParameter("id");
+            if (productIdParam == null || productIdParam.trim().isEmpty()) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Product ID is required");
+                return;
+            }
 
-        // Lấy sản phẩm liên quan
-        List<Product> relatedProducts = getRelatedProducts(product);
+            Integer productId = Integer.parseInt(productIdParam);
+            Product product = productService.findProductById(productId);
+            
+            if (product == null) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found");
+                return;
+            }
 
+            User user = (User) SessionUtil.getInstance().getKey(req, "user");
+            
+            // Log việc xem sản phẩm
+            logProductView(req, resp, product, user);
 
-        req.setAttribute("product", product);
-        req.setAttribute("relatedProducts", relatedProducts);
-        req.getRequestDispatcher("sanpham.jsp").forward(req, resp);
+            // Lấy sản phẩm liên quan
+            List<Product> relatedProducts = getRelatedProducts(product);
+
+            // Check if user has purchased this product
+            boolean hasPurchased = false;
+            if (user != null) {
+                hasPurchased = ratingService.hasUserPurchasedProduct(user.getId(), productId);
+            }
+
+            // Set attributes for JSP
+            req.setAttribute("product", product);
+            req.setAttribute("relatedProducts", relatedProducts);
+            req.setAttribute("hasPurchased", hasPurchased);
+            req.setAttribute("ratingService", ratingService);
+            req.setAttribute("userService", userService);
+            
+            req.getRequestDispatcher("sanpham.jsp").forward(req, resp);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid product ID format");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
+        }
     }
 
     private void logProductView(HttpServletRequest req, HttpServletResponse resp, Product product, User user) {

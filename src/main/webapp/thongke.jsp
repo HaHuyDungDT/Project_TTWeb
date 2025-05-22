@@ -116,11 +116,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -180,7 +180,7 @@
         </div>
     </div>
     <div class="row">
-        <%
+            <%
             ParameterDAO p = new ParameterDAO();
             int currentMonth = LocalDate.now().getMonthValue();
             int currentYear = LocalDate.now().getYear();
@@ -265,46 +265,46 @@
                             <%} else {%>
                             style="width:<%= -rev%>%">
                             <%}%>
+                        </div>
                     </div>
-                </div>
-                <div class="progress-wrapper">
-                    <p>
-                        Lượng sản phẩm bán ra so với tháng trước
-                        <%
-                            int pro = (int) (((currentP.getNumber_pro() - lastP.getNumber_pro()) / lastP.getNumber_pro()) * 100);
-                            if (pro > 0) {%>
-                        <span class="float-right">Tăng <%=pro%>%</span>
-                        <%} else {%>
-                        <span class="float-right">Giảm <%=-pro%>%</span>
-                        <%}%>
-                    </p>
-                    <div class="progress">
-                        <div class="bg-danger"
-                                <%if (pro > 0) {%>
-                             style="width:<%= pro%>%">
+                    <div class="progress-wrapper">
+                        <p>
+                            Lượng sản phẩm bán ra so với tháng trước
+                            <%
+                                int pro = (int) (((currentP.getNumber_pro() - lastP.getNumber_pro()) / lastP.getNumber_pro()) * 100);
+                                if (pro > 0) {%>
+                            <span class="float-right">Tăng <%=pro%>%</span>
                             <%} else {%>
-                            style="width:<%= -pro%>%">
+                            <span class="float-right">Giảm <%=-pro%>%</span>
                             <%}%>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-danger"
+                                    <%if (pro > 0) {%>
+                                 style="width:<%= pro%>%">
+                                <%} else {%>
+                                style="width:<%= -pro%>%">
+                                <%}%>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <%
+            <%
+                        }
+                    }
                 }
-            }
-        }
-    %>
-</div>
-<!-- end main content -->
+            %>
+        </div>
+        <!-- end main content -->
 
-<!-- import script -->
+        <!-- import script -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<script src="js/admin.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-<!-- end import script -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script src="js/admin.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <!-- end import script -->
 </body>
 </html>

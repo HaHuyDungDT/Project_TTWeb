@@ -7,17 +7,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="service.impl.UserServiceImpl" %>
-<%@ page import="utils.SessionUtil" %>
-<%@ page import="model.User" %>
-<%
-    // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
-    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    if(userId == null || 
-       (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
-        response.sendRedirect("dangnhap.jsp");
-    }
-%>
 
 <!DOCTYPE html>
 <html>
@@ -156,11 +145,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">

@@ -146,11 +146,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">

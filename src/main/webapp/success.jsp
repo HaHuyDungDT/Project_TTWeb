@@ -67,7 +67,7 @@
 <div class="container">
     <h1>Công việc đã hoàn tất!</h1>
     <p>Tiếp tục công việc tiếp theo.</p>
-    <button onclick="location.href='quanlyhoadon.jsp'">Tiếp tục công việc</button>
+    <button onclick="location.href='quanlydonhang.jsp'">Tiếp tục công việc</button>
 </div>
 </body>
 <!-- end main content -->

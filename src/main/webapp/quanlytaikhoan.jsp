@@ -4,12 +4,10 @@
 <%@ page import="utils.SessionUtil" %>
 <%@ page import="model.User" %>
 <%@ page import="dao.impl.UserDaoImpl" %>
-<%@ page import="service.impl.UserServiceImpl" %>
 <%
-    // Kiểm tra đăng nhập và phân quyền (chỉ admin mới được vào trang này)
-    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    if(userId == null ||
-            (userId.getRoleId() != 1)){
+    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
+    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
@@ -148,11 +146,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -365,8 +363,7 @@
                         <label>Quyền</label>
                         <select class="form-control" required name="role" id="addRole">
                             <option value="1">Admin</option>
-                            <option value="2">Mod</option>
-                            <option value="3">User</option>
+                            <option value="2">Khách hàng</option>
                         </select>
                     </div>
                     <div class="form-group">

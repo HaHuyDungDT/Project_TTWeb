@@ -15,8 +15,9 @@
     }
 %>
 
-<jsp:useBean id="a" class="dao.impl.OrderDAOImpl" scope="request"></jsp:useBean>
-<jsp:useBean id="b" class="dao.impl.OrderDetailDAOImpl" scope="request"></jsp:useBean>
+
+<jsp:useBean id="a" class="DAO.OrderDAO" scope="request"></jsp:useBean>
+<jsp:useBean id="b" class="DAO.OrderDetailsDAO" scope="request"></jsp:useBean>
 <c:set var="currentDate" value="<%=java.time.LocalDate.now()%>"/>
 <style>
     #dataForm {
@@ -67,11 +68,9 @@
     <ul class="navbar-nav nav-right">
         <li class="nav-item">
             <div class="avt dropdown">
-                <%
-                    User user = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-                %>
-                <a><i class="fa fa-user-o"></i> <%= user.getName() %></a>
-
+                <c:if test="${sessionScope.user != null}">
+                    <a><i class="fa fa-user-o"></i> <%= new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
+                </c:if>
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
                         <a href="logout" class="dropdown-menu-link">
@@ -123,11 +122,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -191,6 +190,81 @@
             <input type="hidden" id="revenueInput" name="calculateRev" value="">
             <input type="hidden" id="productCountInput" name="countPro" value="">
         </form>
+    </div>
+    <div class="row">
+        <%
+            ParameterDAO p = new ParameterDAO();
+            int currentMonth = LocalDate.now().getMonthValue();
+            int currentYear = LocalDate.now().getYear();
+
+            int lastMonth = currentMonth - 1;
+            int lastYear = currentYear;
+            if (lastMonth == 0) {
+                lastMonth = 12;
+                lastYear--;
+            }
+            List<Parameter> list = p.getByMonth(currentMonth, currentYear);
+            List<Parameter> listLast = p.getByMonth(lastMonth, lastYear);
+            if (list != null && listLast != null) {
+                for (Parameter currentP : list) {
+                    for (Parameter lastP : listLast) {%>
+        <div class="col-4 col-m-12 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        Biến động
+                    </h3>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                <div class="card-content">
+                    <div class="progress-wrapper">
+                        <p>
+                            Số đơn hàng so với tháng trước
+                            <span class="float-right"><%=((currentP.getNumber_ord() - lastP.getNumber_ord()) / lastP.getNumber_ord()) * 100%>%</span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-success"
+                                 style="width: <%=((currentP.getNumber_ord()- lastP.getNumber_ord())/lastP.getNumber_ord())*100%>%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Số khách mua hàng so với tháng trước
+                            <span class="float-right"><%=((currentP.getNumber_cus() - lastP.getNumber_cus()) / lastP.getNumber_cus()) * 100%>%</span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-primary"
+                                 style="width:<%=((currentP.getNumber_cus()- lastP.getNumber_cus())/lastP.getNumber_cus())*100%>%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Doanh thu so với tháng trước
+                            <span class="float-right"><%=((currentP.getRevenue() - lastP.getRevenue()) / lastP.getRevenue()) * 100%>%</span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-warning"
+                                 style="width:<%=((currentP.getRevenue()- lastP.getRevenue())/lastP.getRevenue())*100%>%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Lượng sản phẩm bán ra so với tháng trước
+                            <span class="float-right"><%=((currentP.getNumber_pro() - lastP.getNumber_pro()) / lastP.getNumber_pro()) * 100%>%</span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-danger"
+                                 style="width:<%=((currentP.getNumber_pro()- lastP.getNumber_pro())/lastP.getNumber_pro())*100%>%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%
+                    }
+                }
+            }
+        %>
     </div>
 </div>
 <!-- end main content -->

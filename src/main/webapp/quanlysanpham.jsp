@@ -13,8 +13,8 @@
 <%
     // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
     User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    if(userId == null || 
-       (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
+    if(userId == null ||
+            (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
@@ -156,11 +156,11 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">

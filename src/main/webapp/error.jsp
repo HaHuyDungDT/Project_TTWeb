@@ -68,7 +68,7 @@
     <h2>Lỗi!</h2>
 
     <p>Có lỗi xảy ra trong quá trình xử lý yêu cầu.</p>
-    <button onclick="location.href='quanlyhoadon.jsp'">Quay lại trang trước</button>
+    <button onclick="location.href='quanlydonhang.jsp'">Quay lại trang trước</button>
 </div>
 </body>
 <!-- end main content -->

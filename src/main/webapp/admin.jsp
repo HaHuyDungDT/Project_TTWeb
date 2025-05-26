@@ -55,10 +55,9 @@
     <ul class="navbar-nav nav-right">
         <li class="nav-item">
             <div class="avt dropdown">
-                <%
-                    User user = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-                %>
-                <a><i class="fa fa-user-o"></i> <%= user.getName() %></a>
+                <c:if test="${sessionScope.user != null}">
+                    <a><i class="fa fa-user-o"></i> <%= new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
+                </c:if>
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
                         <a href="logout" class="dropdown-menu-link">
@@ -93,8 +92,6 @@
                 <span>Thông số bán hàng</span>
             </a>
         </li>
-        
-        <c:if test="${sessionScope.user.roleId == 1}">
         <li class="sidebar-nav-item">
             <a href="admin.jsp" class="sidebar-nav-link">
                 <div>
@@ -103,8 +100,6 @@
                 <span>Quản lý nhân viên</span>
             </a>
         </li>
-        </c:if>
-        
         <li class="sidebar-nav-item">
             <a href="quanlysanpham.jsp" class="sidebar-nav-link">
                 <div>
@@ -113,17 +108,14 @@
                 <span>Quản lý sản phẩm</span>
             </a>
         </li>
-        
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <span>Quản lý hóa đơn</span>
+                <span>Quản lý đơn hàng</span>
             </a>
         </li>
-        
-        <c:if test="${sessionScope.user.roleId == 1}">
         <li class="sidebar-nav-item">
             <a href="quanlytaikhoan" class="sidebar-nav-link">
                 <div>
@@ -132,7 +124,6 @@
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
-        </c:if>
     </ul>
 </div>
 <!-- end sidebar -->

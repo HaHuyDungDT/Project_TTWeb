@@ -13,6 +13,7 @@ import model.Producer;
 import model.Product;
 import model.ProductType;
 import service.IProductService;
+import utils.CacheManager;
 
 import java.util.List;
 
@@ -22,46 +23,79 @@ public class ProductServiceImpl implements IProductService {
     private IProducerDAO producerDAO = new ProducerDAOImpl();
     private IProductTypeDAO productTypeDAO = new ProductTypeDAOImpl();
 
+    private static final String CACHE_KEY_ALL_PRODUCTS = "all_products";
+    private static final String CACHE_KEY_NEW_PRODUCTS = "new_products";
+    private static final String CACHE_KEY_SALE_PRODUCTS = "sale_products";
+    private static final String CACHE_KEY_SELLING_PRODUCTS = "selling_products";
+
     @Override
     public List<Product> findAll() {
-        List<Product> products = productDAO.findAll();
-        for (Product product : products){
-            List<Image> images = imageDAO.findByProductId(product.getId());
-            product.setImages(images);
-            ProductType productType = productTypeDAO.findById(product.getProductTypeID());
-            product.setProductType(productType);
-            Producer producer = producerDAO.findById(product.getProducerID());
-            product.setProducer(producer);
+        List<Product> products = (List<Product>) CacheManager.get(CACHE_KEY_ALL_PRODUCTS);
+        if (products == null) {
+            System.out.println("Cache khong co du lieu cho " + CACHE_KEY_ALL_PRODUCTS + " - Dang truy van tu database");
+            products = productDAO.findAll();
+            for (Product product : products) {
+                List<Image> images = imageDAO.findByProductId(product.getId());
+                ProductType productType = productTypeDAO.findById(product.getProductTypeID());
+                Producer producer = producerDAO.findById(product.getProducerID());
+                product.setImages(images);
+                product.setProductType(productType);
+                product.setProducer(producer);
+            }
+            CacheManager.put(CACHE_KEY_ALL_PRODUCTS, products);
+        } else {
+            System.out.println("Da lay du lieu tu cache cho " + CACHE_KEY_ALL_PRODUCTS);
         }
         return products;
     }
 
     @Override
     public List<Product> findNewProduct() {
-        List<Product> products = productDAO.findNewProduct();
-        for (Product product : products) {
-            List<Image> images = imageDAO.findByProductId(product.getId());
-            product.setImages(images);
+        List<Product> products = (List<Product>) CacheManager.get(CACHE_KEY_NEW_PRODUCTS);
+        if (products == null) {
+            System.out.println("Cache khong co du lieu cho " + CACHE_KEY_NEW_PRODUCTS + " - Dang truy van tu database");
+            products = productDAO.findNewProduct();
+            for (Product product : products) {
+                List<Image> images = imageDAO.findByProductId(product.getId());
+                product.setImages(images);
+            }
+            CacheManager.put(CACHE_KEY_NEW_PRODUCTS, products);
+        } else {
+            System.out.println("Da lay du lieu tu cache cho " + CACHE_KEY_NEW_PRODUCTS);
         }
         return products;
     }
 
     @Override
     public List<Product> findSaleProduct() {
-        List<Product> products = productDAO.findSaleProduct();
-        for (Product product : products) {
-            List<Image> images = imageDAO.findByProductId(product.getId());
-            product.setImages(images);
+        List<Product> products = (List<Product>) CacheManager.get(CACHE_KEY_SALE_PRODUCTS);
+        if (products == null) {
+            System.out.println("Cache khong co du lieu cho " + CACHE_KEY_SALE_PRODUCTS + " - Dang truy van tu database");
+            products = productDAO.findSaleProduct();
+            for (Product product : products) {
+                List<Image> images = imageDAO.findByProductId(product.getId());
+                product.setImages(images);
+            }
+            CacheManager.put(CACHE_KEY_SALE_PRODUCTS, products);
+        } else {
+            System.out.println("Da lay du lieu tu cache cho " + CACHE_KEY_SALE_PRODUCTS);
         }
         return products;
     }
 
     @Override
     public List<Product> findSellingProduct() {
-        List<Product> products = productDAO.findProductIsSelling();
-        for (Product product : products) {
-            List<Image> images = imageDAO.findByProductId(product.getId());
-            product.setImages(images);
+        List<Product> products = (List<Product>) CacheManager.get(CACHE_KEY_SELLING_PRODUCTS);
+        if (products == null) {
+            System.out.println("Cache khong co du lieu cho " + CACHE_KEY_SELLING_PRODUCTS + " - Dang truy van tu database");
+            products = productDAO.findProductIsSelling();
+            for (Product product : products) {
+                List<Image> images = imageDAO.findByProductId(product.getId());
+                product.setImages(images);
+            }
+            CacheManager.put(CACHE_KEY_SELLING_PRODUCTS, products);
+        } else {
+            System.out.println("Da lay du lieu tu cache cho " + CACHE_KEY_SELLING_PRODUCTS);
         }
         return products;
     }
@@ -146,7 +180,11 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public boolean deleteById(Integer productId) {
-        return productDAO.deleteById(productId);
+        boolean result = productDAO.deleteById(productId);
+        if (result) {
+            clearProductCache();
+        }
+        return result;
     }
 
     @Override
@@ -193,11 +231,19 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public boolean updateProduct(Product product) {
-        return productDAO.updateProduct(product);
+        boolean result = productDAO.updateProduct(product);
+        if (result) {
+            clearProductCache();
+        }
+        return result;
     }
     @Override
     public boolean insert(Product product) {
-        return productDAO.addProduct(product);
+        boolean result = productDAO.addProduct(product);
+        if (result) {
+            clearProductCache();
+        }
+        return result;
     }
 
     @Override
@@ -208,6 +254,13 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public List<Producer> getProducers() {
         return producerDAO.findAll(); // hoặc trả về danh sách Producer theo logic cụ thể
+    }
+
+    private void clearProductCache() {
+        CacheManager.remove(CACHE_KEY_ALL_PRODUCTS);
+        CacheManager.remove(CACHE_KEY_NEW_PRODUCTS);
+        CacheManager.remove(CACHE_KEY_SALE_PRODUCTS);
+        CacheManager.remove(CACHE_KEY_SELLING_PRODUCTS);
     }
 }
 

@@ -275,4 +275,8 @@ public boolean addProduct(Product product) {
         return products;
     }
 
+    public static void main(String[] args) {
+        ProductDAOImpl p = new ProductDAOImpl();
+        System.out.println( p.findNewProduct());
+    }
 }

@@ -15,6 +15,11 @@ public class StoreCategoryServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // 1. Thiết lập charset cho request để lấy đúng tham số có dấu
+        req.setCharacterEncoding("UTF-8");
+        // 2. Thiết lập charset cho response để trả về đúng encoding
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
         String name = req.getParameter("name");
         // Tạo mã tự động (VD: uppercase + gạch dưới)
         String code = name.toUpperCase().replaceAll("\\s+", "_");

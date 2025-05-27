@@ -56,7 +56,7 @@
         <li class="nav-item">
             <div class="avt dropdown">
                 <c:if test="${sessionScope.user != null}">
-                    <a><i class="fa fa-user-o"></i> <%= new UserServiceImpl().getById(SessionUtil.getInstance().getKey((HttpServletRequest) request, "user").toString()).getName() %></a>
+                    <a><i class="fa fa-user-o"></i> ${sessionScope.user.name}</a>
                 </c:if>
                 <ul id="user-menu" class="dropdown-menu">
                     <li class="dropdown-menu-item">
@@ -106,6 +106,12 @@
                     <i class="fa fa-mobile"></i>
                 </div>
                 <span>Quản lý sản phẩm</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+                <div><i class="fas fa-list-alt"></i></div>
+                <span>Quản lý danh mục sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">

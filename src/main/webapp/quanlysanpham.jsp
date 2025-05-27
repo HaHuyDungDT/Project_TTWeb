@@ -134,9 +134,7 @@
                 <div>
                     <i class="fa-solid fa-signal"></i>
                 </div>
-                <span>
-						Thông số bán hàng
-					</span>
+                <span>Thông số bán hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -153,6 +151,12 @@
                     <i class="fa fa-mobile"></i>
                 </div>
                 <span>Quản lý sản phẩm</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+                <div><i class="fas fa-list-alt"></i></div>
+                <span>Quản lý danh mục sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">

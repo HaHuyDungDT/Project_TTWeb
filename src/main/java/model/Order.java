@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ public class Order {
     private String note;
     private String payment_method;
     private LocalDateTime orderDate;
+    @Nullable
     private LocalDateTime deliveryDate;
     private Double totalPrice;
 }

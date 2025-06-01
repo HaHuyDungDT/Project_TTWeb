@@ -71,9 +71,12 @@ public class EditOrderController extends HttpServlet {
                 orderEdit.setOrderDate(LocalDate.parse(dateOrder).atStartOfDay());
             }
             String doneDate = request.getParameter("doneDate");
-            if(doneDate != null && !doneDate.isEmpty()) {
+            if (doneDate != null && !doneDate.trim().isEmpty()) {
                 System.out.println("doneDate: " + doneDate);
                 orderEdit.setDeliveryDate(LocalDate.parse(doneDate).atStartOfDay());
+            } else {
+                System.out.println("doneDate is empty => set deliveryDate = null");
+                orderEdit.setDeliveryDate(null);
             }
             orderEdit.setTotalPrice(Double.parseDouble(request.getParameter("totalPrice")));
             if(orderDAO.updateOrder(orderEdit)) {

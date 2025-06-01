@@ -193,6 +193,36 @@ public class OrderDAOImpl implements IOrderDAO {
         );
         return rowsAffected > 0;
     }
+    @Override
+    public List<OrderDetails> getDetailsByOrderId(int orderId) {
+        String sql =
+                "SELECT od.id, od.amount, od.quantity, " +
+                        "p.id AS product_id, p.name AS product_name, p.price AS product_price " +
+                        "FROM order_details od " +
+                        "JOIN products p ON od.product_id = p.id " +
+                        "WHERE od.order_id = :orderId";
+
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("orderId", orderId)
+                        .map((rs, ctx) -> {
+                            Product product = new Product();
+                            product.setId(rs.getInt("product_id"));
+                            product.setName(rs.getString("product_name"));
+                            product.setPrice(rs.getDouble("product_price"));
+
+                            OrderDetails od = new OrderDetails();
+                            od.setId(rs.getInt("id"));
+                            od.setAmount(rs.getDouble("amount"));
+                            od.setQuantity(rs.getInt("quantity"));
+                            od.setProduct(product);
+
+                            return od;
+                        })
+                        .list()
+        );
+    }
+
 
     public static void main(String[] args) {
         OrderDAOImpl dao = new OrderDAOImpl();

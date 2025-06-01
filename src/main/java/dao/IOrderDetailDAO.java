@@ -11,4 +11,6 @@ public interface IOrderDetailDAO {
     boolean addOrderDetails(OrderDetails orderDetails);
     boolean updateOrderDetails(OrderDetails orderDetails);
     boolean deleteOrder(Integer idOrderDetails);
+    List<OrderDetails> findByOrderId(Integer orderId);
+
 }

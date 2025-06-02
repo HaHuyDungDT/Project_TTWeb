@@ -53,8 +53,23 @@ public class AddOrderController extends HttpServlet {
             order.setStatus(status);
             order.setNote(note);
             order.setPayment_method(payment);
-            order.setOrderDate(LocalDate.parse(req.getParameter("dateOrder")).atStartOfDay());
-            order.setDeliveryDate(LocalDate.parse(req.getParameter("doneDate")).atStartOfDay());
+//            order.setOrderDate(LocalDate.parse(req.getParameter("dateOrder")).atStartOfDay());
+//            order.setDeliveryDate(LocalDate.parse(req.getParameter("doneDate")).atStartOfDay());
+            // Kiểm tra và gán ngày đặt hàng
+            String orderDateParam = req.getParameter("dateOrder");
+            if (orderDateParam != null && !orderDateParam.isEmpty()) {
+                order.setOrderDate(LocalDate.parse(orderDateParam).atStartOfDay());
+            } else {
+                order.setOrderDate(LocalDate.now().atStartOfDay()); // hoặc throw exception nếu muốn bắt buộc nhập
+            }
+
+            // Kiểm tra và gán ngày giao hàng (có thể cho phép null)
+            String doneDateParam = req.getParameter("doneDate");
+            if (doneDateParam != null && !doneDateParam.isEmpty()) {
+                order.setDeliveryDate(LocalDate.parse(doneDateParam).atStartOfDay());
+            } else {
+                order.setDeliveryDate(null); // cho phép để trống
+            }
             order.setTotalPrice(total);
             System.out.println(order);
            if (orderDao.addOrder(order) > 0 ) {

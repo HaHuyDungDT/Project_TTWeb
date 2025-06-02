@@ -98,7 +98,7 @@
 <div class="sidebar">
     <ul class="sidebar-nav">
         <li class="sidebar-nav-item">
-            <a href="#" class="sidebar-nav-link" style="margin-top: 20px;">
+            <a href="thongso.jsp" class="sidebar-nav-link" style="margin-top: 20px;">
                 <div>
                     <i class="fa-solid fa-signal"></i>
                 </div>
@@ -122,6 +122,12 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
+            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+                <div><i class="fas fa-list-alt"></i></div>
+                <span>Quản lý danh mục sản phẩm</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
             <a href="quanlydonhang.jsp" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
@@ -130,7 +136,7 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlytaikhoan.jsp" class="sidebar-nav-link">
+            <a href="quanlytaikhoan" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-circle-user"></i>
                 </div>

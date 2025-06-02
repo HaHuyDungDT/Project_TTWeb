@@ -10,4 +10,5 @@ public interface IProductTypeDAO {
     boolean save(ProductType productType);
     boolean update(ProductType productType);
     boolean delete(Integer productTypeId);
+    List<ProductType> search(String keyword);
 }

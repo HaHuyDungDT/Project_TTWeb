@@ -52,6 +52,11 @@
         opacity: 1!important;;
     }
 
+    .type_white_color {
+        color: white;
+    }
+
+
 
 </style>
 <body class="overlay-scrollbar">
@@ -110,9 +115,7 @@
                 <div>
                     <i class="fa-solid fa-signal"></i>
                 </div>
-                <span>
-						Thông số bán hàng
-					</span>
+                <span>Thông số bán hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -129,6 +132,12 @@
                     <i class="fa fa-mobile"></i>
                 </div>
                 <span>Quản lý sản phẩm</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+                <div><i class="fas fa-list-alt"></i></div>
+                <span>Quản lý danh mục sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
@@ -199,15 +208,24 @@
                                 <td>${p.getTotalPrice() } VNĐ
                                 </td>
                                 <td>
-                                    <a href="#deleteSuccessModal" class="btn btn-info"  data-toggle="modal" >
+                                    <a href="#"
+                                       class="btn btn-info btn-view-order"
+                                       data-toggle="modal"
+                                       data-id="${p.id}">
                                         <i class="material-icons">visibility</i> Xem
                                     </a>
-                                    <a href="#editOrderModal" class="btn btn-success edit-order btn-edit"  data-toggle="modal"  data-id="${p.id}"  data-order-id="${p.id}">
+                                    <a href="#editOrderModal" class=
+                                            "btn btn-success edit-order btn-edit
+                                            ${p.status == 'Hoàn tất' || p.status == 'Hủy đơn hàng' ? 'disabled' : ''}"
+                                       data-toggle="modal"  data-id="${p.id}"  data-order-id="${p.id}">
                                         <i class="material-icons">edit</i> Chỉnh sửa
                                     </a>
+
                                     <!-- Nút Xác nhận đã giao -->
                                     <button type="button"
-                                            class="btn btn-primary btn-confirm"
+                                            class="
+                                            btn btn-primary btn-confirm
+                                            ${p.status == 'Hoàn tất' || p.status == 'Hủy đơn hàng' ? 'disabled' : ''}"
                                             data-id="${p.id}"
                                             data-order-id="${p.id}">
                                         <i class="material-icons">check_circle</i> Xác nhận đã giao
@@ -215,7 +233,8 @@
 
                                     <!-- Nút Hủy đơn -->
                                     <button type="button"
-                                            class="btn btn-danger btn-cancel"
+                                            class="btn btn-danger btn-cancel
+                                            ${p.status == 'Hoàn tất' || p.status == 'Hủy đơn hàng' ? 'disabled' : ''}"
                                             data-id="${p.id}"
                                             data-order-id="${p.id}">
                                         <i class="material-icons">cancel</i> Hủy đơn
@@ -263,7 +282,7 @@
                         </div>
                         <div class="form-group">
                             <label>Trạng thái</label>
-                            <select name="status" id="editStatus" class="form-control" required>
+                            <select name="status" id="editStatus" class="form-control">
                                 <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
                                 <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
                                 <option value="Đang giao">Đang giao</option>
@@ -288,7 +307,9 @@
                         </div>
                         <div class="form-group">
                             <label>Ngày nhận hàng</label>
-                            <input type="date" class="form-control" name="doneDate" id="editDeliveryDate" required>
+                            <input type="date" name="doneDate" class="form-control" id="editDeliveryDate">
+
+                        <%--                            <input type="date" class="form-control" name="doneDate" id="editDeliveryDate" required>--%>
                         </div>
                         <div class="form-group">
                             <label>Tổng tiền</label>
@@ -329,7 +350,7 @@
                         </div>
                         <div class="form-group">
                             <label>Trạng thái đơn hàng</label>
-                            <select name="status" class="form-control" required>
+                            <select name="status" id="addStatus" class="form-control">
                                 <option value="" disabled selected>Trạng thái</option>
                                 <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
                                 <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
@@ -357,7 +378,9 @@
                         </div>
                         <div class="form-group">
                             <label>Ngày nhận hàng</label>
-                            <input type="date" name="doneDate" class="form-control" required>
+                            <input type="date" name="doneDate" class="form-control" id="addDeliveryDate"/>
+
+<%--                            <input type="date" name="doneDate" class="form-control" required>--%>
                         </div>
                         <div class = "form-group">
                             <label>Tổng tiền</label>
@@ -434,7 +457,51 @@
     </div>
 </div>
 <!-- Modal Thông báo Sửa Sản Phẩm Thành Công -->
-<%--End Modal thông báo--%>
+<!-- Modal Chi tiết đơn hàng -->
+<!-- Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Chi tiết đơn hàng</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <tr><th>Mã đơn hàng:</th><td id="orderId"></td></tr>
+                    <tr><th>Tài khoản:</th><td id="orderCustomer"></td></tr>
+                    <tr><th>Địa chỉ:</th><td id="orderAddress"></td></tr>
+                    <tr><th>SĐT:</th><td id="orderPhone"></td></tr>
+                    <tr><th>Trạng thái:</th><td id="orderStatus"></td></tr>
+                    <tr><th>Phương thức thanh toán:</th><td id="orderPayment"></td></tr>
+                    <tr><th>Ngày đặt hàng:</th><td id="orderDate"></td></tr>
+                    <tr><th>Ngày giao:</th><td id="doneDate"></td></tr>
+                    <tr><th>Ghi chú:</th><td id="orderNote"></td></tr>
+                    <tr><th>Tổng tiền:</th><td id="orderTotal"></td></tr>
+                </table>
+
+                <h5>Sản phẩm trong đơn hàng</h5>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orderDetailBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<%--Modal phần chi tiết order--%>
+
 
 
 <!-- import script -->
@@ -657,35 +724,149 @@
         setOrderStatus(id, "Đang giao");
     });
 </script>
+
+
 <script>
-    function saveDisabledState(orderId, status) {
-        const state = JSON.parse(localStorage.getItem("orderButtonStates") || "{}");
-        state[orderId] = status;
-        localStorage.setItem("orderButtonStates", JSON.stringify(state));
-    }
+    $(document).on('click', '.btn-view-order', function () {
+        const orderId = $(this).data('id');
+        console.log("🔍 Đang lấy đơn hàng ID:", orderId);
 
-    function restoreButtonStates() {
-        const state = JSON.parse(localStorage.getItem("orderButtonStates") || "{}");
-        Object.keys(state).forEach(orderId => {
-            updateButtonState(orderId, state[orderId]);
+        $.ajax({
+            url: "/order-view?id=" + orderId,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("✅ Dữ liệu nhận được:", data);
+
+                const order = data.order;
+                const details = data.details;
+
+                // Hiển thị thông tin đơn hàng
+                $('#orderId').text(order.id);
+                $('#orderCustomer').text(order.user.username);
+                $('#orderAddress').text(order.address);
+                $('#orderPhone').text(order.phone_number);
+                $('#orderStatus').text(order.status);
+                $('#orderPayment').text(order.payment_method);
+                $('#orderDate').text(order.orderDate.split("T")[0]);
+                $('#doneDate').text(order.deliveryDate.split("T")[0]);
+                $('#orderNote').text(order.note || '');
+                $('#orderTotal').text(Number(order.totalPrice).toLocaleString() + " VND");
+
+                // Tạo nội dung chi tiết đơn hàng
+                let htmlDetails = "";
+                details.forEach((item, index) => {
+                    console.log("🔍 Item:", item);
+
+                    const product = item.product || {}; // fallback rỗng nếu null
+                    const productName = product.name || "Tên không xác định";
+                    const quantity = item.quantity ?? '0';
+                    const productPrice = product.price != null
+                        ? Number(product.price).toLocaleString()
+                        : '0';
+                    const amount = item.amount != null
+                        ? Number(item.amount).toLocaleString()
+                        : '0';
+
+                    htmlDetails += "<tr>" +
+                        "<td>" + (index + 1) + "</td>" +
+                        "<td>" + productName + "</td>" +
+                        "<td>" + quantity + "</td>" +
+                        "<td>" + productPrice + " VND</td>" +
+                        "<td>" + amount + " VND</td>" +
+                        "</tr>";
+
+                });
+
+                console.log("✅ htmlDetails tạo ra:", htmlDetails);
+                $('#orderDetailBody').html(htmlDetails);
+                $('#orderDetailsModal').modal('show');
+
+
+            },
+            error: function (xhr) {
+                console.error("❌ Lỗi khi gọi API:", xhr.responseText);
+                $('#orderDetailBody').html("<tr><td colspan='5' class='text-danger'>Không thể tải chi tiết đơn hàng.</td></tr>");
+                $('#orderDetailsModal').modal('show');
+            }
         });
-    }
-
-    // Thêm vào hàm setOrderStatus sau khi gọi updateButtonState
-    function setOrderStatus(orderId, status) {
-        $.post("/order-set-status", { id: orderId, status: status }, function () {
-            updateButtonState(orderId, status);
-            saveDisabledState(orderId, status); // <== Lưu trạng thái sau mỗi thay đổi
-        });
-    }
-
-    $(document).ready(function () {
-        restoreButtonStates(); // <== Gọi khi load trang
     });
+
 </script>
 
+<%--<script>--%>
+<%--    function toggleDeliveryRequired() {--%>
+<%--        const status = document.getElementById("editStatus").value;--%>
+<%--        const deliveryInput = document.getElementById("editDeliveryDate");--%>
 
+<%--        if (status === "Hoàn tất" ) {--%>
+<%--            deliveryInput.setAttribute("required", "required");--%>
+<%--        } else {--%>
+<%--            deliveryInput.removeAttribute("required");--%>
+<%--        }--%>
+<%--    }--%>
 
+<%--    // Gọi khi trang vừa load--%>
+<%--    document.addEventListener("DOMContentLoaded", function () {--%>
+<%--        document.getElementById("editStatus").addEventListener("change", toggleDeliveryRequired);--%>
+<%--        toggleDeliveryRequired(); // gọi ban đầu nếu có sẵn giá trị--%>
+<%--    });--%>
+<%--</script>--%>
+
+<%--<script>--%>
+<%--    function toggleDeliveryRequiredAdd() {--%>
+<%--        const status = document.getElementById("addStatus").value;--%>
+<%--        const deliveryInput = document.getElementById("addDeliveryDate");--%>
+
+<%--        if (status === "Hoàn tất") {--%>
+<%--            deliveryInput.setAttribute("required", "required");--%>
+<%--        } else {--%>
+<%--            deliveryInput.removeAttribute("required");--%>
+<%--        }--%>
+<%--    }--%>
+
+<%--    document.addEventListener("DOMContentLoaded", function () {--%>
+<%--        const statusInput = document.getElementById("addStatus");--%>
+<%--        if (statusInput) {--%>
+<%--            statusInput.addEventListener("change", toggleDeliveryRequiredAdd);--%>
+<%--            toggleDeliveryRequiredAdd(); // gọi ban đầu nếu có sẵn giá trị--%>
+<%--        }--%>
+<%--    });--%>
+<%--</script>--%>
+<script>
+    function toggleDeliveryRequired(statusId, deliveryId) {
+        const status = document.getElementById(statusId);
+        const deliveryInput = document.getElementById(deliveryId);
+
+        if (!status || !deliveryInput) return;
+
+        if (status.value === "Hoàn tất") {
+            deliveryInput.setAttribute("required", "required");
+        } else {
+            deliveryInput.removeAttribute("required");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Gọi cho Edit
+        const editStatus = document.getElementById("editStatus");
+        if (editStatus) {
+            editStatus.addEventListener("change", function () {
+                toggleDeliveryRequired("editStatus", "editDeliveryDate");
+            });
+            toggleDeliveryRequired("editStatus", "editDeliveryDate");
+        }
+
+        // Gọi cho Add
+        const addStatus = document.getElementById("addStatus");
+        if (addStatus) {
+            addStatus.addEventListener("change", function () {
+                toggleDeliveryRequired("addStatus", "addDeliveryDate");
+            });
+            toggleDeliveryRequired("addStatus", "addDeliveryDate");
+        }
+    });
+</script>
 
 <!-- end import script -->
 </body>

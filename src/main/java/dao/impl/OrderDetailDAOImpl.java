@@ -40,6 +40,33 @@ public class OrderDetailDAOImpl implements IOrderDetailDAO {
         });
         return orderDetails;
     }
+    @Override
+    public List<OrderDetails> findByOrderId(Integer orderId) {
+        String sql = "SELECT od.*, p.id AS p_id, p.name AS p_name, p.price AS p_price " +
+                "FROM order_details od JOIN products p ON od.product_id = p.id " +
+                "WHERE od.order_id = :orderId";
+
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("orderId", orderId)
+                        .map((rs, ctx) -> {
+                            OrderDetails detail = new OrderDetails();
+                            detail.setId(rs.getInt("id"));
+                            detail.setQuantity(rs.getInt("quantity"));
+                            detail.setAmount(rs.getDouble("amount"));
+
+                            Product product = new Product();
+                            product.setId(rs.getInt("p_id"));
+                            product.setName(rs.getString("p_name"));
+                            product.setPrice(rs.getDouble("p_price"));
+                            detail.setProduct(product);
+
+                            return detail;
+                        })
+                        .list()
+        );
+
+    }
 
 //    public List<OrderDetails> findByIdOrder(Integer idOrder) {
 //        List<OrderDetails> ordersDetails = JDBIConnector.getConnect().withHandle(handle -> {

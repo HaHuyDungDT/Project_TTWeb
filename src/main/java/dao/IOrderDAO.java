@@ -1,6 +1,7 @@
 package dao;
 
 import model.Order;
+import model.OrderDetails;
 
 import java.util.List;
 
@@ -10,4 +11,6 @@ public interface IOrderDAO {
     int addOrder(Order order);
     boolean updateOrder(Order order);
     boolean deleteOrder(Integer idOrder);
+
+    List<OrderDetails> getDetailsByOrderId(int orderId);
 }

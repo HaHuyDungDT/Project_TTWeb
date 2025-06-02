@@ -10,12 +10,11 @@ public class ProductTypeDAOImpl implements IProductTypeDAO {
 
     @Override
     public List<ProductType> findAll() {
-        List<ProductType> productTypes = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createQuery("SELECT id, name, code FROM product_types")
-                    .mapToBean(ProductType.class)
-                    .list();
-        });
-        return productTypes;
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createQuery("SELECT id, name, code FROM product_types WHERE active = 1")
+                        .mapToBean(ProductType.class)
+                        .list()
+        );
     }
 
     public static void main(String[] args) {
@@ -28,20 +27,20 @@ public class ProductTypeDAOImpl implements IProductTypeDAO {
 
     @Override
     public ProductType findById(int id) {
-        ProductType productType = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.select("SELECT id, name, code FROM product_types WHERE id = :id")
-                    .bind("id", id)
-                    .mapToBean(ProductType.class)
-                    .findFirst()
-                    .orElse(null);
-        });
-        return productType;
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createQuery("SELECT id, name, code FROM product_types WHERE id = :id AND active = 1")
+                        .bind("id", id)
+                        .mapToBean(ProductType.class)
+                        .findFirst()
+                        .orElse(null)
+        );
     }
 
     @Override
     public boolean save(ProductType productType) {
         int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("INSERT INTO product_type (name, code) VALUES (:name, :code)")
+            return handle.createUpdate(
+                            "INSERT INTO product_types (name, code) VALUES (:name, :code)")
                     .bind("name", productType.getName())
                     .bind("code", productType.getCode())
                     .execute();
@@ -52,9 +51,11 @@ public class ProductTypeDAOImpl implements IProductTypeDAO {
     @Override
     public boolean update(ProductType productType) {
         int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("UPDATE product_type SET name = :name, code = :code WHERE id = :id")
+            return handle.createUpdate(
+                            "UPDATE product_types SET name = :name, code = :code WHERE id = :id")
                     .bind("name", productType.getName())
                     .bind("code", productType.getCode())
+                    .bind("id", productType.getId())
                     .execute();
         });
         return rowsAffected > 0;
@@ -62,14 +63,47 @@ public class ProductTypeDAOImpl implements IProductTypeDAO {
 
     @Override
     public boolean delete(Integer productTypeId) {
-        int rowsAffected = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createUpdate("Delete from product_type WHERE id = :id")
-                    .bind("id", productTypeId)
-                    .execute();
-        });
-        return rowsAffected > 0;
+        // chuyển về inactive thay vì xoá
+        int rows = JDBIConnector.getConnect().withHandle(h ->
+                h.createUpdate("UPDATE product_types SET active = 0 WHERE id = :id")
+                        .bind("id", productTypeId)
+                        .execute()
+        );
+        return rows > 0;
     }
 
+    @Override
+    public List<ProductType> search(String keyword) {
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createQuery(
+                                "SELECT id,name,code FROM product_types " +
+                                        "WHERE active = 1 AND (name LIKE :kw OR code LIKE :kw)")
+                        .bind("kw","%"+keyword+"%")
+                        .mapToBean(ProductType.class)
+                        .list()
+        );
+    }
+
+    public int count() {
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createQuery("SELECT COUNT(*) FROM product_types WHERE active = 1")
+                        .mapTo(int.class).findOnly()
+        );
+    }
+
+    /**
+     * Lấy danh mục theo trang: offset = (page-1)*pageSize, limit = pageSize
+     */
+    public List<ProductType> findByPage(int offset, int limit) {
+        return JDBIConnector.getConnect().withHandle(h ->
+                h.createQuery(
+                                "SELECT id, name, code FROM product_types " +
+                                        "WHERE active = 1 LIMIT :offset, :limit")
+                        .bind("offset", offset).bind("limit", limit)
+                        .mapToBean(ProductType.class)
+                        .list()
+        );
+    }
 
 
 }

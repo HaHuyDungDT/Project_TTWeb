@@ -143,6 +143,10 @@
                             </div>
                         </div>
                         <div class="order-col">
+                            <div>Thời gian giao hàng dự kiến</div>
+                            <div id="estimated-delivery-time"><i>Vui lòng chọn địa chỉ...</i></div>
+                        </div>
+                        <div class="order-col">
                             <div><strong>TỔNG TIỀN</strong></div>
                             <div>
                                 <strong class="order-total">

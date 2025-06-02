@@ -23,15 +23,17 @@ public class AddCartItemRestController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=utf-8");
 
         // 1) Kiểm tra login
         User user = (User) SessionUtil.getInstance().getKey(request, "user");
         if (user == null) {
             response.setStatus(401);
+            response.setContentType("application/json; charset=UTF-8");
             JsonObject err = new JsonObject();
             err.addProperty("error", "Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng!");
             response.getWriter().print(err.toString());
+            response.getWriter().flush();
             return;
         }
 

@@ -167,8 +167,11 @@ $(document).ready(function () {
 			data: {
 				productId: productId,
 			},
+			dataType: 'json', // Thêm dataType để jQuery tự parse JSON
 			success: function (data) {
-				$('#cart-quantity').text(data.message);
+				// Cập nhật số lượng cart với totalItems thay vì message
+				$('#cart-quantity').text(data.totalItems);
+
 				Toastify({
 					text: data.status,
 					duration: 3000,
@@ -183,21 +186,32 @@ $(document).ready(function () {
 					onClick: function(){}
 				}).showToast();
 			},
-			error: function (data) {
-				const message = data.responseText;
+			error: function (xhr, status, error) {
+				let message = "Có lỗi xảy ra!"; // Default message
+
+				try {
+					// Parse JSON response để lấy error message
+					const response = JSON.parse(xhr.responseText);
+					if (response.error) {
+						message = response.error;
+					}
+				} catch (e) {
+					// Nếu không parse được JSON, sử dụng responseText hoặc default message
+					message = xhr.responseText || "Có lỗi xảy ra!";
+				}
 
 				Toastify({
 					text: message,
 					duration: 3000,
 					newWindow: true,
 					close: true,
-					gravity: "top", // `top` or `bottom`
-					position: "right", // `left`, `center` or `right`
-					stopOnFocus: true, // Prevents dismissing of toast on hover
+					gravity: "top",
+					position: "right",
+					stopOnFocus: true,
 					style: {
 						background: "#D10024",
 					},
-					onClick: function(){} // Callback after click
+					onClick: function(){}
 				}).showToast();
 			}
 		});
@@ -277,46 +291,70 @@ $(document).ready(function () {
 	});
 	/*Khi phườg xã thay đổi thì giá tiền sẽ cập nhật*/
 	$('#ward-select').change(function () {
-		let fromProvinceID = 202;
 		let fromDistrictID = 3695;
 		let fromWard = "90737";
-		let toProvinceId = parseInt($('#province-select').val());
 		let toDistrictID = parseInt($('#district-select').val());
 		let toWard = $(this).val();
 
+		// Bước 1: Lấy service_id
 		$.ajax({
-			url: `https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee?from_province_id=202&from_district_id=3695&from_ward_code=90737&to_province_id=${toProvinceId}&to_district_id=${toDistrictID}&to_ward_code=${toWard}&service_type_id=2&weight=500`,
-			type: "GET",
+			url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services",
+			type: "POST",
 			headers: {
-				"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec",
-				"shop_id": "4982538"
+				"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec"
 			},
-			success: function (response) {
-				if (response.code === 200) {
-					let shippingFee = response.data.total; // Phí vận chuyển (số nguyên)
-					let formattedFee = new Intl.NumberFormat('vi-VN', {
-						style: 'currency',
-						currency: 'VND'
-					}).format(shippingFee);
-					$('#formattedPrice').html(formattedFee);
+			contentType: "application/json",
+			data: JSON.stringify({
+				shop_id: 4982538,
+				from_district: fromDistrictID,
+				to_district: toDistrictID
+			}),
+			success: function (res) {
+				if (res.code === 200 && res.data.length > 0) {
+					let serviceId = res.data[0].service_id;
 
-					// Cập nhật tổng tiền trên giao diện
-					updateTotalPrice(shippingFee);
-
-					// Đồng bộ với server
-					fetchAndUpdateTotalPrice();
+					// Bước 2: Gọi API lấy leadtime
+					$.ajax({
+						url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
+						type: "POST",
+						headers: {
+							"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec"
+						},
+						contentType: "application/json",
+						data: JSON.stringify({
+							from_district_id: fromDistrictID,
+							from_ward_code: fromWard,
+							to_district_id: toDistrictID,
+							to_ward_code: toWard,
+							service_id: serviceId
+						}),
+						success: function (res) {
+							if (res.code === 200) {
+								let timestamp = res.data.leadtime;
+								let date = new Date(timestamp * 1000); // Đổi từ UNIX timestamp sang ngày
+								let formattedDate = date.toLocaleDateString('vi-VN', {
+									weekday: 'long',
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric'
+								});
+								$('#estimated-delivery-time').html('Dự kiến giao hàng: ' + formattedDate);
+							} else {
+								$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
+							}
+						},
+						error: function(error) {
+							console.error("Error getting leadtime:", error);
+							$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
+						}
+					});
 				} else {
-					console.error("Error calculating fee", response.message);
-					$('#formattedPrice').html('0 VNĐ');
-					updateTotalPrice(0);
-					fetchAndUpdateTotalPrice();
+					$('#estimated-delivery-time').html('<i>Không có dịch vụ vận chuyển đến địa chỉ này</i>');
 				}
 			},
-			error: function (error) {
-				console.error("Error calculating fee", error);
-				$('#formattedPrice').html('0 VNĐ');
-				updateTotalPrice(0);
-				fetchAndUpdateTotalPrice();
+			error: function(error) {
+				console.error("Error getting available services:", error);
+				$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
 			}
 		});
 	});

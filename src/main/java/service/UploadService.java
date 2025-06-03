@@ -16,9 +16,9 @@ public class UploadService {
 
     private Cloudinary createCloudinary() {
         // Lưu ý: Hard-code các key nhạy cảm chỉ dùng cho testing local. Không sử dụng trong production.
-        String cloudName = "your_cloud_name";
-        String apiKey = "your_api_key";
-        String apiSecret = "your_api_secret";
+        String cloudName = "dhhvmdtcz";
+        String apiKey = "824244389152141";
+        String apiSecret = "4hNp7VpB29IDLzteZCIpHlOai8A";
 
         return new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudName,

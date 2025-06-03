@@ -16,11 +16,14 @@
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <link rel="icon" href="./img/logo.png" type="image/x-icon"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/slick.min.js"></script>
     <script src="js/nouislider.min.js"></script>
     <script src="js/jquery.zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="js/main.js"></script>
     <jsp:useBean id="a" class="dao.impl.OrderDetailDAOImpl" scope="request"/>
     <jsp:useBean id="b" class="dao.impl.CouponImpl" scope="request"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -217,7 +220,6 @@
     </div>
 </div>
 <jsp:include page="footer.jsp"/>
-<script src="js/main.js"></script>
 <script>
     $("#payment-1").change(() => {
         var productPriceText = $('.product-price.total').text();
@@ -232,16 +234,18 @@
         var selectedPayment = document.querySelector('input[name="payment"]:checked');
         var checkbox = document.getElementById('terms');
         if (checkbox.checked && orderForm.checkValidity() && selectedPayment) {
-            $('#oderEmployeeModal').modal('show');
-
+            // Submit form thay vì hiển thị modal
+            orderForm.submit();
         } else {
             alert("Vui lòng điền đầy đủ thông tin và đồng ý với các điều khoản.");
         }
     }
+
     function confirmOrder() {
         $('#oderEmployeeModal').modal('hide');
         window.location.href = 'index.jsp';
     };
+
     function payByVNPay(amount) {
         $.ajax({
             type: "POST",
@@ -270,11 +274,11 @@
 </script>
 <script>
     $(document).ready(function () {
-        <% Boolean OrderSuccess = (Boolean)request.getSession().getAttribute("OrderSuccess");%>
-        <% if (OrderSuccess != null && OrderSuccess) { %>
-        $('#oderEmployeeModal').modal('show');
-        <% request.getSession().removeAttribute("OrderSuccess"); %>
-        <% } %>
+        // Kiểm tra nếu có tham số success trong URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            $('#oderEmployeeModal').modal('show');
+        }
     });
 </script>
 

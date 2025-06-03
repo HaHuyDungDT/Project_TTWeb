@@ -1,15 +1,6 @@
 package controller;
 
-import dao.impl.CouponImpl;
-import dao.impl.ProductDAOImpl;
-import model.Coupon;
 import model.Product;
-import model.User;
-import model.cart.Cart;
-import model.cart.CartItem;
-import service.ICartService;
-import service.impl.CartServiceImpl;
-import utils.SessionUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,4 +31,5 @@ public class UpdateTotalPriceServlet extends HttpServlet {
         response.setContentType("application/json");
         response.getWriter().write("{\"totalPrice\": " + totalPrice + "}");
     }
+
 }

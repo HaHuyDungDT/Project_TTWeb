@@ -204,7 +204,7 @@
         };
 
         $.ajax({
-            url: '/update-quantity-cart-item',
+            url: 'update-quantity-cart-item',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),

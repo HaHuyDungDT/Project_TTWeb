@@ -55,7 +55,7 @@
     <form action="login" method="post" onsubmit="return validateCaptcha()">
         <input type="text" placeholder="Tên đăng nhập" name="username" required value="${username}">
         <input type="password" placeholder="Mật khẩu" name="password" required value="${password}">
-        <div class="g-recaptcha" data-sitekey="6LcO8S4rAAAAAAImGtcuOSXPiJ2PlG30HGpY_7lw"></div>
+        <div class="g-recaptcha" data-sitekey="6LfhkFMrAAAAAEaIJYJLbwyl7p9gkOeE0hQZkuOv"></div>
         <br/>
         <div class="recover">
             <a href="quenmatkhau">Quên mật khẩu?</a>
@@ -65,10 +65,10 @@
     <div class="social-login">
         <div class="social-buttons">
             <!-- Cập nhật URL redirect cho Facebook sử dụng giao thức HTTPS và port 8443 -->
-            <button type="button" class="facebook-btn" onclick="window.location.href='https://www.facebook.com/dialog/oauth?client_id=1675975133288218&redirect_uri=https://localhost:8443/Project_Web_war/login-facebook&scope=email'">
+            <button type="button" class="facebook-btn" onclick="window.location.href='https://www.facebook.com/dialog/oauth?client_id=1634221603925099&redirect_uri=https://hadung6765.id.vn/login-facebook&scope=email'">
                 <i class="fab fa-facebook-f"></i> Đăng nhập với Facebook
             </button>
-            <button type="button" class="google-btn" onclick="window.location.href='https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:8080/Project_Web_war/google-callback&response_type=code&client_id=676076034879-g16cni1a76vt4bcvb49vvtq0ogqrfi5b.apps.googleusercontent.com'">
+            <button type="button" class="google-btn" onclick="window.location.href='https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=https://hadung6765.id.vn/google-callback&response_type=code&client_id=800399794298-a10k3fp23jkjptrgnabjp98ms85ig55h.apps.googleusercontent.com'">
                 <i class="fab fa-google"></i> Đăng nhập với Google
             </button>
         </div>

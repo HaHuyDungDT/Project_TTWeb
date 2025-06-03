@@ -5,10 +5,12 @@
 <%@ page import="model.User" %>
 <%@ page import="dao.impl.UserDaoImpl" %>
 <%
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
-    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+    // Kiểm tra đăng nhập & phân quyền
+    User user = (User) SessionUtil.getInstance()
+            .getKey((javax.servlet.http.HttpServletRequest) request, "user");
+    if (user == null || (user.getRoleId() != 1 ) && (user.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
+        return;
     }
 %>
 
@@ -119,7 +121,6 @@
 <!-- sidebar -->
 <div class="sidebar">
     <ul class="sidebar-nav">
-
         <li class="sidebar-nav-item">
             <a href="/admin" class="sidebar-nav-link">
                 <div>
@@ -141,7 +142,7 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="/storeCategory" class="sidebar-nav-link">
+            <a href="/quanlydanhmuc.jsp" class="sidebar-nav-link">
                 <div><i class="fas fa-list-alt"></i></div>
                 <span>Quản lý danh mục sản phẩm</span>
             </a>
@@ -162,13 +163,20 @@
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
-        <!-- Thêm mục Quản lý tồn kho -->
         <li class="sidebar-nav-item">
             <a href="/quanlytonkho" class="sidebar-nav-link">
                 <div>
-                    <i class="fa-solid fa-boxes-stacked"></i> <!-- icon tồn kho -->
+                    <i class="fa-solid fa-boxes-stacked"></i>
                 </div>
                 <span>Quản lý tồn kho</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="/quanlylog.jsp" class="sidebar-nav-link ">
+                <div>
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <span>Quản lý log</span>
             </a>
         </li>
     </ul>
@@ -202,6 +210,7 @@
                             <th>Email</th>
                             <th>Username</th>
                             <th>Password</th>
+                            <th>Quyền</th>
                             <th>Hành động</th>
                         </tr>
                         </thead>
@@ -217,6 +226,14 @@
                                 <td>${item.email}</td>
                                 <td>${item.username}</td>
                                 <td>${item.password}</td>
+                                <td>
+                                    <select class="form-control role-select" data-user-id="${item.id}" ${user.roleId != 1 ? 'disabled' : ''}>
+                                        <option value="${item.roleId}" selected>${item.roleId == 1 ? 'Admin' : item.roleId == 2 ? 'Mod' : 'User'}</option>
+                                        <c:if test="${item.roleId != 1}"><option value="1">Admin</option></c:if>
+                                        <c:if test="${item.roleId != 2}"><option value="2">Mod</option></c:if>
+                                        <c:if test="${item.roleId != 3}"><option value="3">User</option></c:if>
+                                    </select>
+                                </td>
                                 <td>
                                     <a href="#"
                                        data-id="${item.id}"
@@ -291,6 +308,14 @@
                         <label>Password</label>
                         <input type="password" class="form-control" name="password" id="editPassword">
                     </div>
+                    <div class="form-group">
+                        <label>Quyền</label>
+                        <select class="form-control" required name="role" id="editRole">
+                            <option value="1">Admin</option>
+                            <option value="2">User</option>
+                            <option value="3">Mod</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
@@ -360,7 +385,8 @@
                         <label>Quyền</label>
                         <select class="form-control" required name="role" id="addRole">
                             <option value="1">Admin</option>
-                            <option value="2">Khách hàng</option>
+                            <option value="2">Mod</option>
+                            <option value="3">User</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -449,203 +475,245 @@
 
 <!-- end import script -->
 <script>
-
-
-    $(document).on('click', '.edit', function (e) {
-
+$(document).ready(function() {
+    // Xử lý khi click vào nút edit
+    $('.edit').on('click', function(e) {
         e.preventDefault();
         const btn = $(this);
         const id = btn.data('id');
-        console.log("Đã click edit với ID: ", id);
-
+        
         // Gọi API để lấy dữ liệu user
         $.ajax({
             url: "/quanlytaikhoan/account-edit?id=" + id,
             method: "GET",
             dataType: "json",
-            //     success: function (user) {
-            //       $('#editId').val(user.id);
-            //       $('#editName').val(user.name);
-            //       $('#editPhone').val(user.phone);
-            //       $('#editAddress').val(user.address);
-            //       $('#editDate').val(user.birth);
-            //       $('#editGender').val(user.gender);
-            //       $('#editEmail').val(user.email);
-            //       $('#editUser').val(user.username);
-            //       $('#editPassword').val(""); // clear password input
-            //       $('#editEmployeeModal').modal('show');
-            //     },
-            //     error: function () {
-            //       alert("Không thể lấy thông tin người dùng");
-            //     }
-            //   });
-            // });
-            success: function (user) {
-                $('#editId').val(user.id);
-                $('#editName').val(user.name);
-                $('#editPhone').val(user.phone);
-                $('#editAddress').val(user.address);
-
-                // ⚠️ xử lý ngày sinh: nếu null thì để trống, nếu không thì format yyyy-MM-dd
-                if (user.birth) {
-                    const dateObj = new Date(user.birth);
-                    const formattedDate = dateObj.toISOString().split('T')[0];
-                    $('#editDate').val(formattedDate);
+            success: function(user) {
+                if (user) {
+                    $('#editId').val(user.id);
+                    $('#editName').val(user.name);
+                    $('#editPhone').val(user.phone);
+                    $('#editAddress').val(user.address);
+                    
+                    // Xử lý ngày sinh
+                    if (user.birth) {
+                        const dateObj = new Date(user.birth);
+                        const formattedDate = dateObj.toISOString().split('T')[0];
+                        $('#editDate').val(formattedDate);
+                    } else {
+                        $('#editDate').val('');
+                    }
+                    
+                    $('#editGender').val(user.gender);
+                    $('#editEmail').val(user.email);
+                    $('#editUser').val(user.username);
+                    $('#editPassword').val("");
+                    $('#editRole').val(user.roleId);
+                    $('#editEmployeeModal').modal('show');
                 } else {
-                    $('#editDate').val('');
+                    alert("Không thể lấy thông tin người dùng");
                 }
-
-                $('#editGender').val(user.gender);
-                $('#editEmail').val(user.email);
-                $('#editUser').val(user.username);
-                $('#editPassword').val("");
-                $('#editEmployeeModal').modal('show');
             },
-            error: function () {
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
                 alert("Không thể lấy thông tin người dùng");
             }
         });
     });
 
+    // Xử lý form edit
+    $('#edit').on('submit', function(e) {
+        e.preventDefault();
+        const formData = {
+            id: $('#editId').val(),
+            name: $('#editName').val(),
+            phone: $('#editPhone').val(),
+            address: $('#editAddress').val(),
+            date: $('#editDate').val(),
+            gender: $('#editGender').val(),
+            email: $('#editEmail').val(),
+            user: $('#editUser').val(),
+            password: $('#editPassword').val(),
+            role: $('#editRole').val()
+        };
 
-
-
-    $(document).ready(function() {
-        // Sự kiện xóa tài khoản
-        $('.delete').on('click', function (e) {
-            e.preventDefault();
-            var btn = $(this);
-            var id = btn.data('id');
-            $('#idDel').val(id);  // Lưu ID vào input hidden
-            $('#deleteEmployeeModal').modal('show'); // Hiển thị modal xác nhận
-
-            // Xử lý xóa tài khoản khi nhấn nút Xóa trong modal
-            $('#btnDel').on('click', function () {
-                $.ajax({
-                    url: "/quanlytaikhoan/account-delete",  // Đường dẫn xóa tài khoản
-                    method: "POST",
-                    data: { id: id },
-                    success: function (response) {
-                        // alert('Xóa tài khoản thành công');
-                        location.reload();  // Reload lại trang
-                    },
-                    error: function () {
-                        alert('Đã có lỗi xảy ra khi xóa tài khoản');
-                    }
-                });
-            });
+        $.ajax({
+            url: "/quanlytaikhoan/account-edit",
+            method: "POST",
+            data: formData,
+            success: function(response) {
+                $('#editEmployeeModal').modal('hide');
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                alert("Có lỗi xảy ra khi cập nhật thông tin");
+            }
         });
+    });
 
-
-        // xử lý form add user---------------------------
-        //ajax
-        $('#add').on('submit', function(e) {
-            e.preventDefault(); // Ngăn form gửi mặc định
-
-            let form = $(this);
-            let name = $('#addName').val();
-            let address = $('#addAddress').val();
-            let date = $('#addDate').val();
-            let phone = $('#addPhone').val();
-            let email = $('#addEmail').val();
-            let user = $('#addUser').val();
-            let password = $('#addPassword').val();
-            console.log(name, address, date, phone, email, user, password);
-
-            if (!name || !address || !date || !phone || !email || !user || !password) {
-                alert('Hãy nhập đầy đủ thông tin!');
-                return;
-            }
-
-            var regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i;
-            var regexPhone = /^0(3|5|7|8|9)[0-9]{8}$/i;
-
-            if (!regexEmail.test(removeAscent(email))) {
-                alert('Sai định dạng Email!');
-                return;
-            }
-
-            if (!regexPhone.test(removeAscent(phone))) {
-                alert('Sai định dạng số điện thoại!');
-                return;
-            }
-
-            // Kiểm tra email
+    // Xử lý cập nhật quyền
+    $('.role-select').on('change', function() {
+        const userId = $(this).data('user-id');
+        const newRoleId = $(this).val();
+        const select = $(this);
+        
+        if(confirm('Bạn có chắc chắn muốn thay đổi quyền của người dùng này?')) {
             $.ajax({
-                url: "/quanlytaikhoan/account-add?email=" + email,
-                dataType: "json",
-                method: "GET",
-                success: (emailOK) => {
-                    if (emailOK) {
-                        // Kiểm tra user
-                        $.ajax({
-                            url: "/quanlytaikhoan/account-add?user=" + user,
-                            dataType: "json",
-                            method: "PUT",
-                            success: (userOK) => {
-                                if (userOK) {
-                                    // Submit lại thật sự bằng JavaScript
-                                    form.unbind('submit').submit();
-
-                                } else {
-                                    alert("Username đã tồn tại!");
-                                }
-                            }
-                        });
-                    } else {
-                        alert("Email đã tồn tại!");
+                url: '/quanlytaikhoan/update-role',
+                method: 'POST',
+                data: {
+                    userId: userId,
+                    roleId: newRoleId
+                },
+                success: function(response) {
+                    try {
+                        const result = typeof response === 'string' ? JSON.parse(response) : response;
+                        if(result.success) {
+                            alert('Cập nhật quyền thành công!');
+                            window.location.reload();
+                        } else {
+                            alert(result.message || 'Có lỗi xảy ra khi cập nhật quyền!');
+                            select.val(select.find('option:selected').val()); // Reset về giá trị cũ
+                        }
+                    } catch(e) {
+                        console.error("Error parsing response:", e);
+                        alert('Có lỗi xảy ra khi cập nhật quyền!');
+                        select.val(select.find('option:selected').val()); // Reset về giá trị cũ
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", error);
+                    alert('Có lỗi xảy ra khi cập nhật quyền!');
+                    select.val(select.find('option:selected').val()); // Reset về giá trị cũ
+                }
+            });
+        } else {
+            // Reset về giá trị cũ nếu người dùng hủy
+            select.val(select.find('option:selected').val());
+        }
+    });
+
+    // Sự kiện xóa tài khoản
+    $('.delete').on('click', function (e) {
+        e.preventDefault();
+        var btn = $(this);
+        var id = btn.data('id');
+        $('#idDel').val(id);  // Lưu ID vào input hidden
+        $('#deleteEmployeeModal').modal('show'); // Hiển thị modal xác nhận
+
+        // Xử lý xóa tài khoản khi nhấn nút Xóa trong modal
+        $('#btnDel').on('click', function () {
+            $.ajax({
+                url: "/quanlytaikhoan/account-delete",  // Đường dẫn xóa tài khoản
+                method: "POST",
+                data: { id: id },
+                success: function (response) {
+                    location.reload();  // Reload lại trang
+                },
+                error: function () {
+                    alert('Đã có lỗi xảy ra khi xóa tài khoản');
                 }
             });
         });
-        // đóng ajax ngoài cùng
-    }); // ✅ ĐÓNG $(document).ready
-
-</script>
-<script>
-    function removeAscent(str) {
-        if (str === null || str === undefined) return '';
-        str = str.toLowerCase();
-        str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // bỏ dấu tiếng Việt
-        str = str.replace(/đ/g, "d").replace(/Đ/g, "D");
-        return str;
-    }
-</script>
-<!-- Thông báo Thêm -->
-<script>
-    $(document).ready(function () {
-        <% Boolean addSuccess = (Boolean) session.getAttribute("addAccountSuccess"); %>
-        <% if (addSuccess != null && addSuccess) { %>
-        $('#addSuccessModal').modal('show');
-        <% session.removeAttribute("addAccountSuccess"); %>
-        <% } %>
     });
-</script>
 
-<!-- Thông báo Sửa -->
-<script>
-    $(document).ready(function () {
-        <% Boolean editSuccess = (Boolean) session.getAttribute("editAccountSuccess"); %>
-        <% if (editSuccess != null && editSuccess) { %>
-        $('#editSuccessModal').modal('show');
-        <% session.removeAttribute("editAccountSuccess"); %>
-        <% } %>
+    // xử lý form add user
+    $('#add').on('submit', function(e) {
+        e.preventDefault(); // Ngăn form gửi mặc định
+
+        let form = $(this);
+        let name = $('#addName').val();
+        let address = $('#addAddress').val();
+        let date = $('#addDate').val();
+        let phone = $('#addPhone').val();
+        let email = $('#addEmail').val();
+        let user = $('#addUser').val();
+        let password = $('#addPassword').val();
+        let gender = $('#addGender').val();
+        let role = $('#addRole').val();
+
+        if (!name || !address || !date || !phone || !email || !user || !password) {
+            alert('Hãy nhập đầy đủ thông tin!');
+            return;
+        }
+
+        var regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i;
+        var regexPhone = /^0(3|5|7|8|9)[0-9]{8}$/i;
+
+        if (!regexEmail.test(removeAscent(email))) {
+            alert('Sai định dạng Email!');
+            return;
+        }
+
+        if (!regexPhone.test(removeAscent(phone))) {
+            alert('Sai định dạng số điện thoại!');
+            return;
+        }
+
+        // Kiểm tra email
+        $.ajax({
+            url: "/quanlytaikhoan/account-add?email=" + email,
+            dataType: "json",
+            method: "GET",
+            success: (emailOK) => {
+                if (emailOK) {
+                    // Kiểm tra user
+                    $.ajax({
+                        url: "/quanlytaikhoan/account-add?user=" + user,
+                        dataType: "json",
+                        method: "PUT",
+                        success: (userOK) => {
+                            if (userOK) {
+                                // Submit lại thật sự bằng JavaScript
+                                form.unbind('submit').submit();
+                            } else {
+                                alert("Username đã tồn tại!");
+                            }
+                        }
+                    });
+                } else {
+                    alert("Email đã tồn tại!");
+                }
+            }
+        });
     });
+});
+
+// Hàm xử lý dấu tiếng Việt
+function removeAscent(str) {
+    if (str === null || str === undefined) return '';
+    str = str.toLowerCase();
+    str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // bỏ dấu tiếng Việt
+    str = str.replace(/đ/g, "d").replace(/Đ/g, "D");
+    return str;
+}
+
+// Thông báo Thêm
+$(document).ready(function () {
+    <% Boolean addSuccess = (Boolean) session.getAttribute("addAccountSuccess"); %>
+    <% if (addSuccess != null && addSuccess) { %>
+    $('#addSuccessModal').modal('show');
+    <% session.removeAttribute("addAccountSuccess"); %>
+    <% } %>
+});
+
+// Thông báo Sửa
+$(document).ready(function () {
+    <% Boolean editSuccess = (Boolean) session.getAttribute("editAccountSuccess"); %>
+    <% if (editSuccess != null && editSuccess) { %>
+    $('#editSuccessModal').modal('show');
+    <% session.removeAttribute("editAccountSuccess"); %>
+    <% } %>
+});
+
+// Thông báo Xóa
+$(document).ready(function () {
+    <% Boolean deleteSuccess = (Boolean) session.getAttribute("deleteAccountSuccess"); %>
+    <% if (deleteSuccess != null && deleteSuccess) { %>
+    $('#deleteSuccessModal').modal('show');
+    <% session.removeAttribute("deleteAccountSuccess"); %>
+    <% } %>
+});
 </script>
-
-<!-- Thông báo Xóa -->
-<script>
-    $(document).ready(function () {
-        <% Boolean deleteSuccess = (Boolean) session.getAttribute("deleteAccountSuccess"); %>
-        <% if (deleteSuccess != null && deleteSuccess) { %>
-        $('#deleteSuccessModal').modal('show');
-        <% session.removeAttribute("deleteAccountSuccess"); %>
-        <% } %>
-    });
-</script>
-
-
-
-
 </body>
 </html>

@@ -6,11 +6,10 @@ import java.util.List;
 
 public interface ILogService {
     void info(String message);
-    void alert(String message) ;
-    void warning(String message) ;
-    void danger(String message) ;
-    void error(String message) ;
-    Log save(Log log);
+    void warning(String message);
+    void danger(String message);
+    void save(Log log);
     List<Log> findAll();
-    List<Log> findByUserId(int userId);
+    List<Log> findByLevel(String level);
+    List<Log> search(String query);
 }

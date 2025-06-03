@@ -9,10 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.*;
+import java.util.stream.Collectors;
 
 public class LogServiceImpl implements ILogService {
     private static final Logger logger = Logger.getLogger(LogServiceImpl.class.getName());
-    private ILogDAO logDAO = new LogDAOImpl();
+    private ILogDAO logDao = new LogDAOImpl();
     static {
         try {
             // File handler ghi log vào file
@@ -31,54 +32,48 @@ public class LogServiceImpl implements ILogService {
         }
     }
 
-    // Phương thức ghi log thông tin
     @Override
     public void info(String message) {
         logger.info(getFormattedMessage("INFO", message));
     }
 
-    // Phương thức ghi log cảnh báo
     @Override
     public void warning(String message) {
         logger.warning(getFormattedMessage("WARNING", message));
     }
 
-    // Phương thức ghi log báo động
-    @Override
-    public void alert(String message) {
-        logger.severe(getFormattedMessage("ALERT", message));
-    }
-
-    // Phương thức ghi log nguy hiểm
     @Override
     public void danger(String message) {
         logger.severe(getFormattedMessage("DANGER", message));
     }
 
-    // Phương thức ghi log lỗi
-    public void error(String message) {
-        logger.severe(getFormattedMessage("ERROR", message));
-    }
-
     @Override
-    public Log save(Log log) {
-        return logDAO.save(log);
+    public void save(Log log) {
+        logDao.save(log);
     }
 
     @Override
     public List<Log> findAll() {
-        return logDAO.findAll();
+        return logDao.findAll();
     }
 
     @Override
-    public List<Log> findByUserId(int userId) {
-        return logDAO.findByUserId(userId);
+    public List<Log> findByLevel(String level) {
+        return logDao.findAll().stream()
+                .filter(log -> log.getLevel().toString().equals(level))
+                .collect(Collectors.toList());
     }
 
-    // Phương thức ghi log lỗi kèm Exception
-    public void error(String message, Exception e) {
-        logger.severe(getFormattedMessage("ERROR", message));
-        e.printStackTrace();
+    @Override
+    public List<Log> search(String query) {
+        String searchQuery = query.toLowerCase();
+        return logDao.findAll().stream()
+                .filter(log -> 
+                    log.getAction().toLowerCase().contains(searchQuery) ||
+                    log.getLevel().toString().toLowerCase().contains(searchQuery) ||
+                    log.getAddressIP().toLowerCase().contains(searchQuery) ||
+                    String.valueOf(log.getUserId()).contains(searchQuery))
+                .collect(Collectors.toList());
     }
 
     // Định dạng thông điệp log với timestamp

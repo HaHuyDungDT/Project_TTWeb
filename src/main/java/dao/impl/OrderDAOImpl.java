@@ -3,6 +3,7 @@ package dao.impl;
 import dao.IOrderDAO;
 import db.JDBIConnector;
 import model.*;
+import org.jdbi.v3.core.Jdbi;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -22,16 +23,6 @@ public class OrderDAOImpl implements IOrderDAO {
             "LEFT JOIN product p ON od.product_id = p.id " +
             "LEFT JOIN image i ON p.id = i.product_id";
 
-    //    @Override
-//    public List<Order> findAll() {
-//        List<Order> orders = JDBIConnector.getConnect().withHandle(handle -> {
-//            return handle.createQuery(BASE_QUERY)
-//                    .mapToBean(Order.class)
-//                    .list();
-//        });
-//
-//        return orders;
-//    }
     @Override
     public List<Order> findAll() {
         return JDBIConnector.getConnect().withHandle(handle -> {
@@ -58,17 +49,6 @@ public class OrderDAOImpl implements IOrderDAO {
         });
     }
 
-    //    @Override
-//    public Order findById(Integer id) {
-//        Order order = JDBIConnector.getConnect().withHandle(handle -> {
-//            return handle.createQuery(BASE_QUERY + " WHERE id = :id")
-//                    .bind("id", id)
-//                    .mapToBean(Order.class)
-//                    .findFirst()
-//                    .orElse(null);
-//        });
-//        return order;
-//    }
     @Override
     public Order findById(Integer id) {
         return JDBIConnector.getConnect().withHandle(handle ->
@@ -96,7 +76,6 @@ public class OrderDAOImpl implements IOrderDAO {
                         .orElse(null)
         );
     }
-
 
     public List<Order> findByIdUser(Integer idUser) {
         List<Order> orders = JDBIConnector.getConnect().withHandle(handle -> {
@@ -193,6 +172,7 @@ public class OrderDAOImpl implements IOrderDAO {
         );
         return rowsAffected > 0;
     }
+
     @Override
     public List<OrderDetails> getDetailsByOrderId(int orderId) {
         String sql =
@@ -223,19 +203,52 @@ public class OrderDAOImpl implements IOrderDAO {
         );
     }
 
+    @Override
+    public List<Order> getOrdersByUserId(Integer userId) {
+        return JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createQuery(ORDER_QUERY + " WHERE o.user_id = :userId ORDER BY o.order_date DESC")
+                    .bind("userId", userId)
+                    .map((rs, ctx) -> {
+                        Order order = new Order();
+                        order.setId(rs.getInt("o.id"));
+                        order.setAddress(rs.getString("o.address"));
+                        order.setPhone_number(rs.getString("o.phone_number"));
+                        order.setStatus(rs.getString("o.status"));
+                        order.setNote(rs.getString("o.note"));
+                        order.setPayment_method(rs.getString("o.payment_method"));
+                        
+                        Date orderDate = rs.getDate("o.order_date");
+                        Date deliveryDate = rs.getDate("o.delivery_date");
+
+                        LocalDateTime orderDateTime = null;
+                        if (orderDate != null) {
+                            Date utilOrderDate = new Date(orderDate.getTime());
+                            Instant instantOrderDate = utilOrderDate.toInstant();
+                            orderDateTime = LocalDateTime.ofInstant(instantOrderDate, ZoneId.systemDefault());
+                        }
+
+                        LocalDateTime deliveryDateTime = null;
+                        if (deliveryDate != null) {
+                            Date utilDeliveryDate = new Date(deliveryDate.getTime());
+                            Instant instantDeliveryDate = utilDeliveryDate.toInstant();
+                            deliveryDateTime = LocalDateTime.ofInstant(instantDeliveryDate, ZoneId.systemDefault());
+                        }
+
+                        order.setOrderDate(orderDateTime);
+                        order.setDeliveryDate(deliveryDateTime);
+                        order.setTotalPrice(rs.getDouble("o.total_price"));
+
+                        User user = new User();
+                        user.setId(rs.getInt("o.user_id"));
+                        order.setUser(user);
+
+                        return order;
+                    })
+                    .list();
+        });
+    }
 
     public static void main(String[] args) {
         OrderDAOImpl dao = new OrderDAOImpl();
-////        List<Order> all = dao.findByIdUser(15);
-////        for (Order order : all) {
-////            System.out.println(order);
-////        }
-////        LocalDateTime orderDate = LocalDateTime.now();
-////        LocalDateTime deliverDate = orderDate.plusDays(3);
-////        Order order = new Order(3, new User(15, null, null, null, null,
-////                null, null, null, null, null, null, null), "DHNL", "0774642187", "Đang giao hàng", "", "Thanh toán khi nhận hàng",
-////                orderDate, deliverDate, 690000.0);
-////        System.out.println(dao.updateOrder(order));
-//
     }
 }

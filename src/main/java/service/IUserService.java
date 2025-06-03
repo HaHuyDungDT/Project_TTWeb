@@ -24,4 +24,5 @@ public interface IUserService {
     String createId(); // Có thể bỏ nếu bạn đã dùng auto_increment
     boolean isUserLocked(String username);
     boolean addFacebookUser(User newUser);
+    boolean updateRole(int userId, int newRoleId);
 }

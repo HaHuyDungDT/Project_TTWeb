@@ -2,8 +2,8 @@ package utils;
 
 public enum LevelLog {
     INFO("INFO"),
-    WARN("WARNING"),
-    ERROR("ERROR");
+    WARNING("WARNING"),
+    DANGER("DANGER");
 
     private final String level;
 
@@ -12,6 +12,11 @@ public enum LevelLog {
     }
 
     public String getLevel() {
+        return level;
+    }
+
+    @Override
+    public String toString() {
         return level;
     }
 }

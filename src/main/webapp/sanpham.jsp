@@ -141,13 +141,13 @@
                                     <c:set var="emptyStars" value="${5 - fullStars - halfStar}" />
                                     <div class="rating-stars">
                                         <c:forEach begin="1" end="${fullStars}" var="i">
-                                            <i class="fa fa-star text-warning"></i>
+                                            <i class="fa fa-star text-warning" style="color: #D10024"></i>
                                         </c:forEach>
                                         <c:if test="${halfStar == 1}">
-                                            <i class="fa fa-star-half-stroke text-warning"></i>
+                                            <i class="fa fa-star-half-stroke text-warning" style="color: #D10024"></i>
                                         </c:if>
                                         <c:forEach begin="1" end="${emptyStars}" var="i">
-                                            <i class="fa fa-star-o text-muted"></i>
+                                            <i class="fa fa-star-o text-muted" style="color: #D10024"></i>
                                         </c:forEach>
                                     </div>
                                 </div>

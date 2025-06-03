@@ -108,23 +108,19 @@ public class OrderController extends HttpServlet {
                         isRemoved = cartService.removeCartItem(productId, cartId);
                     }
                 }
-                String emailContent = "Chào bạn,\n" +
-                        "Đơn hàng của bạn đã được đặt thành công. Chúng tôi sẽ xác nhận đơn hàng và liên hệ với bạn sớm nhất có thể\n" +
-                        "Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi!\n" +
-                        "Địa chỉ: Phone Accessories - Linh Trung - Thủ Đức - Hồ Chí Minh\n" +
-                        "Email: support@phoneaccessories.com | Điện thoại: (0973) 206 403";
 
-                // Gửi email thông báo cho người dùng
-                MailUtil.getInstance().sendMail(emailContent,
-                        "Thông báo thanh toán thành công",
-                        user.getEmail());
+                // Xóa session sau khi đặt hàng thành công
+                session.removeAttribute("selectedProductsList");
+                session.removeAttribute("coupons");
+                session.removeAttribute("discount");
+
+                // Chuyển hướng với tham số success
+                response.sendRedirect("thanhtoan.jsp?success=true");
             } else {
                 request.setAttribute("error", "Tên người dùng hoặc email hoặc số điện thoại không chính xác!");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("check-out.jsp");
                 dispatcher.forward(request, response);
             }
-            session.setAttribute("OrderSuccess", true);
-            response.sendRedirect("index.jsp");
         } else {
             request.setAttribute("error", "Không có sản phẩm nào cả!");
             RequestDispatcher dispatcher = request.getRequestDispatcher("check-out.jsp");

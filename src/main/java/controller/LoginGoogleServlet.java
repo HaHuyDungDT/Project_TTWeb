@@ -44,7 +44,7 @@ public class LoginGoogleServlet extends HttpServlet {
             newUser.setName(googlePojo.getName());
             newUser.setEmail(googlePojo.getEmail());
             newUser.setPicture(googlePojo.getPicture());
-            newUser.setRoleId(4); // Mã role cho người dùng thông thường (có thể điều chỉnh theo hệ thống của bạn)
+            newUser.setRoleId(3); // Mã role cho người dùng thông thường (có thể điều chỉnh theo hệ thống của bạn)
             Timestamp now = new Timestamp(System.currentTimeMillis());
             newUser.setCreatedAt(now.toLocalDateTime());
             newUser.setUpdatedAt(now.toLocalDateTime());
@@ -54,12 +54,13 @@ public class LoginGoogleServlet extends HttpServlet {
             // Lưu dữ liệu mới vào DB
             boolean saved = userService.addGoogleUser(newUser);
             if (!saved) {
-                // Nếu lưu thất bại, có thể chuyển hướng đến trang lỗi
                 response.sendRedirect("error.jsp");
                 return;
             }
-            // Lưu thông tin người dùng mới vào session để sử dụng sau này (ví dụ hiển thị trên profile.jsp)
-            SessionUtil.getInstance().putKey(request, "user", newUser);
+
+            // Lấy lại User từ DB để đảm bảo có ID (dựa theo oauth_uid)
+            User createdUser = userService.getByOAuthUser(googlePojo.getId());
+            SessionUtil.getInstance().putKey(request, "user", createdUser);
         } else {
             // Nếu người dùng đã tồn tại, cập nhật (nếu cần) và lưu vào session
             // Bạn có thể cập nhật access token hoặc các thông tin khác nếu cần

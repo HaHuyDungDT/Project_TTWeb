@@ -17,7 +17,7 @@
 	// Products Slick
 	$('.products-slick').each(function() {
 		var $this = $(this),
-				$nav = $this.attr('data-nav');
+			$nav = $this.attr('data-nav');
 
 		$this.slick({
 			slidesToShow: 4,
@@ -29,27 +29,27 @@
 			arrows: true,
 			appendArrows: $nav ? $nav : false,
 			responsive: [{
-	        breakpoint: 991,
-	        settings: {
-	          slidesToShow: 2,
-	          slidesToScroll: 1,
-	        }
-	      },
-	      {
-	        breakpoint: 480,
-	        settings: {
-	          slidesToShow: 1,
-	          slidesToScroll: 1,
-	        }
-	      },
-	    ]
+				breakpoint: 991,
+				settings: {
+					slidesToShow: 2,
+					slidesToScroll: 1,
+				}
+			},
+				{
+					breakpoint: 480,
+					settings: {
+						slidesToShow: 1,
+						slidesToScroll: 1,
+					}
+				},
+			]
 		});
 	});
 
 	// Products Widget Slick
 	$('.products-widget-slick').each(function() {
 		var $this = $(this),
-				$nav = $this.attr('data-nav');
+			$nav = $this.attr('data-nav');
 
 		$this.slick({
 			infinite: true,
@@ -65,34 +65,34 @@
 
 	// Product Main img Slick
 	$('#product-main-img').slick({
-    infinite: true,
-    speed: 300,
-    dots: false,
-    arrows: true,
-    fade: true,
-    asNavFor: '#product-imgs',
-  });
+		infinite: true,
+		speed: 300,
+		dots: false,
+		arrows: true,
+		fade: true,
+		asNavFor: '#product-imgs',
+	});
 
 	// Product imgs Slick
-  $('#product-imgs').slick({
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    arrows: true,
-    centerMode: true,
-    focusOnSelect: true,
+	$('#product-imgs').slick({
+		slidesToShow: 3,
+		slidesToScroll: 1,
+		arrows: true,
+		centerMode: true,
+		focusOnSelect: true,
 		centerPadding: 0,
 		vertical: true,
-    asNavFor: '#product-main-img',
+		asNavFor: '#product-main-img',
 		responsive: [{
-        breakpoint: 991,
-        settings: {
-					vertical: false,
-					arrows: false,
-					dots: true,
-        }
-      },
-    ]
-  });
+			breakpoint: 991,
+			settings: {
+				vertical: false,
+				arrows: false,
+				dots: true,
+			}
+		},
+		]
+	});
 
 	// Product img zoom
 	var zoomMainProduct = document.getElementById('product-main-img');
@@ -105,9 +105,9 @@
 	// Input number
 	$('.input-number').each(function() {
 		var $this = $(this),
-		$input = $this.find('input[type="number"]'),
-		up = $this.find('.qty-up'),
-		down = $this.find('.qty-down');
+			$input = $this.find('input[type="number"]'),
+			up = $this.find('.qty-up'),
+			down = $this.find('.qty-down');
 
 		down.on('click', function () {
 			var value = parseInt($input.val()) - 1;
@@ -126,7 +126,7 @@
 	});
 
 	var priceInputMax = document.getElementById('price-max'),
-			priceInputMin = document.getElementById('price-min');
+		priceInputMin = document.getElementById('price-min');
 
 	function updatePriceSlider(elem , value) {
 		if ( elem.hasClass('price-min') ) {
@@ -167,11 +167,8 @@ $(document).ready(function () {
 			data: {
 				productId: productId,
 			},
-			dataType: 'json', // Thêm dataType để jQuery tự parse JSON
 			success: function (data) {
-				// Cập nhật số lượng cart với totalItems thay vì message
-				$('#cart-quantity').text(data.totalItems);
-
+				$('#cart-quantity').text(data.message);
 				Toastify({
 					text: data.status,
 					duration: 3000,
@@ -186,32 +183,21 @@ $(document).ready(function () {
 					onClick: function(){}
 				}).showToast();
 			},
-			error: function (xhr, status, error) {
-				let message = "Có lỗi xảy ra!"; // Default message
-
-				try {
-					// Parse JSON response để lấy error message
-					const response = JSON.parse(xhr.responseText);
-					if (response.error) {
-						message = response.error;
-					}
-				} catch (e) {
-					// Nếu không parse được JSON, sử dụng responseText hoặc default message
-					message = xhr.responseText || "Có lỗi xảy ra!";
-				}
+			error: function (data) {
+				const message = data.responseText;
 
 				Toastify({
 					text: message,
 					duration: 3000,
 					newWindow: true,
 					close: true,
-					gravity: "top",
-					position: "right",
-					stopOnFocus: true,
+					gravity: "top", // `top` or `bottom`
+					position: "right", // `left`, `center` or `right`
+					stopOnFocus: true, // Prevents dismissing of toast on hover
 					style: {
 						background: "#D10024",
 					},
-					onClick: function(){}
+					onClick: function(){} // Callback after click
 				}).showToast();
 			}
 		});
@@ -291,12 +277,20 @@ $(document).ready(function () {
 	});
 	/*Khi phườg xã thay đổi thì giá tiền sẽ cập nhật*/
 	$('#ward-select').change(function () {
+		let fromProvinceID = 202;
 		let fromDistrictID = 3695;
 		let fromWard = "90737";
+		let toProvinceId = parseInt($('#province-select').val());
 		let toDistrictID = parseInt($('#district-select').val());
 		let toWard = $(this).val();
 
-		// Bước 1: Lấy service_id
+		if (!toProvinceId || !toDistrictID || !toWard) {
+			$('#formattedPrice').html('0 VNĐ');
+			$('#estimated-delivery-time').html('<i>Vui lòng chọn đầy đủ địa chỉ...</i>');
+			return;
+		}
+
+		// Lấy thời gian giao hàng dự kiến và phí vận chuyển
 		$.ajax({
 			url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services",
 			type: "POST",
@@ -313,51 +307,121 @@ $(document).ready(function () {
 				if (res.code === 200 && res.data.length > 0) {
 					let serviceId = res.data[0].service_id;
 
-					// Bước 2: Gọi API lấy leadtime
+					// Tính phí vận chuyển
 					$.ajax({
-						url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
-						type: "POST",
+						url: `https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee?from_province_id=202&from_district_id=3695&from_ward_code=90737&to_province_id=${toProvinceId}&to_district_id=${toDistrictID}&to_ward_code=${toWard}&service_id=${serviceId}&weight=500`,
+						type: "GET",
 						headers: {
-							"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec"
+							"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec",
+							"shop_id": "4982538"
 						},
-						contentType: "application/json",
-						data: JSON.stringify({
-							from_district_id: fromDistrictID,
-							from_ward_code: fromWard,
-							to_district_id: toDistrictID,
-							to_ward_code: toWard,
-							service_id: serviceId
-						}),
-						success: function (res) {
-							if (res.code === 200) {
-								let timestamp = res.data.leadtime;
-								let date = new Date(timestamp * 1000); // Đổi từ UNIX timestamp sang ngày
-								let formattedDate = date.toLocaleDateString('vi-VN', {
-									weekday: 'long',
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric'
+						success: function (response) {
+							if (response.code === 200) {
+								let shippingFee = response.data.total;
+								let formattedFee = new Intl.NumberFormat('vi-VN', {
+									style: 'currency',
+									currency: 'VND'
+								}).format(shippingFee);
+								$('#formattedPrice').html(formattedFee);
+
+								// Cập nhật tổng tiền trên giao diện
+								updateTotalPrice(shippingFee);
+
+								// Đồng bộ với server
+								fetchAndUpdateTotalPrice();
+
+								// Lấy thời gian giao hàng dự kiến
+								$.ajax({
+									url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime",
+									type: "POST",
+									headers: {
+										"token": "7e2513c5-ed99-11ee-983e-5a49fc0dd8ec"
+									},
+									contentType: "application/json",
+									data: JSON.stringify({
+										from_district_id: fromDistrictID,
+										from_ward_code: fromWard,
+										to_district_id: toDistrictID,
+										to_ward_code: toWard,
+										service_id: serviceId
+									}),
+									success: function (res) {
+										if (res.code === 200) {
+											let timestamp = res.data.leadtime;
+											let date = new Date(timestamp * 1000);
+											let formattedDate = date.toLocaleDateString('vi-VN', {
+												weekday: 'long',
+												year: 'numeric',
+												month: 'long',
+												day: 'numeric'
+											});
+											$('#estimated-delivery-time').html('Dự kiến giao hàng: ' + formattedDate);
+										} else {
+											$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
+										}
+									},
+									error: function(error) {
+										console.error("Error getting leadtime:", error);
+										$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
+									}
 								});
-								$('#estimated-delivery-time').html('Dự kiến giao hàng: ' + formattedDate);
 							} else {
+								console.error("Error calculating fee", response.message);
+								$('#formattedPrice').html('0 VNĐ');
+								updateTotalPrice(0);
+								fetchAndUpdateTotalPrice();
 								$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
 							}
 						},
-						error: function(error) {
-							console.error("Error getting leadtime:", error);
+						error: function (error) {
+							console.error("Error calculating fee", error);
+							$('#formattedPrice').html('0 VNĐ');
+							updateTotalPrice(0);
+							fetchAndUpdateTotalPrice();
 							$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
 						}
 					});
 				} else {
 					$('#estimated-delivery-time').html('<i>Không có dịch vụ vận chuyển đến địa chỉ này</i>');
+					$('#formattedPrice').html('0 VNĐ');
+					updateTotalPrice(0);
+					fetchAndUpdateTotalPrice();
 				}
 			},
 			error: function(error) {
 				console.error("Error getting available services:", error);
 				$('#estimated-delivery-time').html('<i>Không thể tính toán thời gian giao hàng</i>');
+				$('#formattedPrice').html('0 VNĐ');
+				updateTotalPrice(0);
+				fetchAndUpdateTotalPrice();
 			}
 		});
 	});
+
+	function fetchAndUpdateTotalPrice() {
+		var couponId = document.getElementById('couponSelect')?.value || "";
+		var shippingFeeText = document.getElementById('formattedPrice').textContent.replace(' VNĐ', '').replace(/\./g, '');
+		var shippingFee = parseInt(shippingFeeText) || 0;
+
+		$.ajax({
+			url: 'update-total-price',
+			type: 'POST',
+			data: {
+				couponId: couponId,
+				shippingFee: shippingFee.toString()
+			},
+			success: function(response) {
+				if (response && response.totalPrice !== undefined) {
+					var formatted = new Intl.NumberFormat('vi-VN').format(response.totalPrice) + ' VNĐ';
+					document.getElementById('product-price').textContent = formatted;
+					document.getElementById('hiddenTotalPrice').value = response.totalPrice;
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error("Update total price failed", error);
+			}
+		});
+	}
 
 	$('#province-select').select2();
 	$('#district-select').select2();
@@ -366,20 +430,20 @@ $(document).ready(function () {
 
 // Star Rating Interaction
 $(document).ready(function() {
-    $('.star-rating label').hover(
-        function() {
-            $(this).prevAll('label').addClass('hover');
-        },
-        function() {
-            $(this).prevAll('label').removeClass('hover');
-        }
-    );
+	$('.star-rating label').hover(
+		function() {
+			$(this).prevAll('label').addClass('hover');
+		},
+		function() {
+			$(this).prevAll('label').removeClass('hover');
+		}
+	);
 
-    $('.star-rating input').change(function() {
-        var rating = $(this).val();
-        $('.star-rating label').removeClass('selected');
-        $(this).next('label').addClass('selected').prevAll('label').addClass('selected');
-    });
+	$('.star-rating input').change(function() {
+		var rating = $(this).val();
+		$('.star-rating label').removeClass('selected');
+		$(this).next('label').addClass('selected').prevAll('label').addClass('selected');
+	});
 });
 
 

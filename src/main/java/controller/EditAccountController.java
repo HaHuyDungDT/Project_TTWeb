@@ -103,7 +103,7 @@ public class EditAccountController extends HttpServlet {
 
         existingUser.setUpdatedAt(LocalDateTime.now());
         userService.update(existingUser);
-
+        req.getSession().setAttribute("editAccountSuccess", true);
         resp.sendRedirect("/quanlytaikhoan?success=edit");
     }
 

@@ -21,9 +21,25 @@ public class ProductMgmController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Lấy tất cả sản phẩm từ service
-        List<Product> products = productService.findAll();
+        int page = 1;
+        int pageSize = 10;
+        String pageParam = req.getParameter("page");
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
 
+
+        // Lấy tất cả sản phẩm từ service
+//        List<Product> products = productService.findAll();
+        List<Product> products = productService.getProductsByPage(page, pageSize);
+
+        int totalProducts = productService.countProducts();
+        int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
         // Lấy danh sách loại sản phẩm và nhà sản xuất
         List<ProductType> productTypes = productService.getProductTypes();  // Lấy tất cả các loại sản phẩm
         List<Producer> producers = productService.getProducers();  // Lấy tất cả các nhà sản xuất
@@ -32,7 +48,8 @@ public class ProductMgmController extends HttpServlet {
         req.setAttribute("products", products);
         req.setAttribute("productTypes", productTypes);
         req.setAttribute("producers", producers);
-
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
         // Kiểm tra thông báo thành công hoặc thất bại nếu có
         HttpSession session = req.getSession();
         String successMessage = (String) session.getAttribute("successMessage");

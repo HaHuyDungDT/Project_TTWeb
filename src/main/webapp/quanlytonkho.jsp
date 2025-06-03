@@ -1,28 +1,22 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="javax.servlet.http.HttpServletRequest" %>
 <%@ page import="utils.SessionUtil" %>
 <%@ page import="model.User" %>
-<%@ page import="dao.impl.UserDaoImpl" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
-    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+    // Kiểm tra đăng nhập và phân quyền (chỉ admin và mod mới được vào trang này)
+    User userId = (User) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
+    if(userId == null ||
+            (userId.getRoleId() != 1 && userId.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
     }
 %>
-
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <title>Admin</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport"
-          content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-    <link rel="icon" type="image/png" href="./img/logo.png"/>
-
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý tồn kho</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Import lib -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -35,11 +29,17 @@
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <!-- End import lib -->
     <link rel="stylesheet" type="text/css" href="css/styleAdmin.css">
-<%--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">--%>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <style>
+        .product-img {
+            width: 60px;
+            height: auto;
+            object-fit: contain;
+        }
+        .pagination {
+            justify-content: center;
+        }
+    </style>
 </head>
-
 <body class="overlay-scrollbar">
 <!-- navbar -->
 <div class="navbar">
@@ -184,97 +184,113 @@
 <br>
 <br>
 <br>
-<div class="container my-5">
-    <h2 class="mb-4 text-center">Thống kê tổng quan</h2>
-    <div class="row text-white">
-        <div class="col-md-3 mb-3">
-            <div class="card bg-primary shadow-sm rounded-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng doanh thu</h5>
-                    <fmt:setLocale value="vi_VN" />
-                    <fmt:setBundle basename="messages" />
-                    <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="₫"/>                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success shadow-sm rounded-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Sản phẩm đã bán</h5>
-                    <p class="card-text h4">${totalSoldProducts}</p>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Quản lý tồn kho sản phẩm</h2>
+
+    <!-- Modal thông báo -->
+    <c:if test="${not empty successMsg || not empty errorMsg}">
+        <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-white border-bottom-0">
+                        <h5 class="modal-title text-dark" id="statusModalLabel">Thông báo</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-dark">
+                        <c:if test="${not empty successMsg}">
+                            <p>${successMsg}</p>
+                        </c:if>
+                        <c:if test="${not empty errorMsg}">
+                            <p>${errorMsg}</p>
+                        </c:if>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info shadow-sm rounded-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Tài khoản</h5>
-                    <p class="card-text h4">${totalAccounts}</p>
+    </c:if>
+
+    <!-- Form thêm mới tồn kho -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post" action="quanlytonkho" class="form-inline">
+                <input type="hidden" name="action" value="insert">
+                <div class="form-group mr-2">
+                    <label for="productIdAdd" class="mr-2">ID sản phẩm:</label>
+                    <input type="number" class="form-control" name="productId" id="productIdAdd" required>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning shadow-sm rounded-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng số đơn hàng</h5>
-                    <p class="card-text h4">${totalOrders}</p>
+                <div class="form-group mr-2">
+                    <label for="quantityAdd" class="mr-2">Số lượng:</label>
+                    <input type="number" class="form-control" name="quantity" id="quantityAdd" min="0" required>
                 </div>
-            </div>
+                <button type="submit" class="btn btn-success">Thêm mới</button>
+            </form>
         </div>
     </div>
 
-    <div class="card shadow-sm mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Biểu đồ doanh thu theo tháng (năm ${currentYear})</h5>
-            <canvas id="revenueChart"></canvas>
-        </div>
-    </div>
+    <!-- Bảng tồn kho -->
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark text-center">
+        <tr>
+            <th>ID tồn kho</th>
+            <th>Hình ảnh</th>
+            <th>ID sản phẩm</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng tồn</th>
+            <th>Cập nhật / Xóa</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach var="inv" items="${inventories}">
+            <tr class="text-center align-middle">
+                <td>${inv.id}</td>
+                <td><img src="${inv.productImage}" class="product-img"></td>
+                <td>${inv.productId}</td>
+                <td>${inv.productName}</td>
+                <td>${inv.quantity}</td>
+                <td>
+                    <!-- Form cập nhật và xóa gộp chung hàng -->
+                    <div class="d-flex justify-content-center">
+                        <form method="post" action="quanlytonkho" class="form-inline">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="productId" value="${inv.productId}">
+                            <input type="number" class="form-control mr-2" name="quantity" value="${inv.quantity}" min="0" required>
+                            <button type="submit" class="btn btn-primary mr-2">Cập nhật</button>
+                        </form>
+                        <form method="post" action="quanlytonkho" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="productId" value="${inv.productId}">
+                            <button type="submit" class="btn btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination">
+            <c:forEach begin="1" end="${totalPages}" var="i">
+                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                    <a class="page-link" href="?page=${i}">${i}</a>
+                </li>
+            </c:forEach>
+        </ul>
+    </nav>
 </div>
 
-
-</body>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const labels = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
-        "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-    const data = [
-        <c:forEach var="i" begin="1" end="12" varStatus="loop">
-        <c:choose>
-        <c:when test="${monthlyRevenue[i] != null}">
-        ${monthlyRevenue[i]}
-        </c:when>
-        <c:otherwise>0</c:otherwise>
-        </c:choose>
-        <c:if test="${loop.index < 12}">,</c:if>
-        </c:forEach>
-    ];
-
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Doanh thu (VND)',
-                data: data,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 4,
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                tooltip: { mode: 'index', intersect: false }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+    $(document).ready(function () {
+        if ($('#statusModal').length) {
+            $('#statusModal').modal('show');
         }
     });
 </script>
-
-
+</body>
 </html>

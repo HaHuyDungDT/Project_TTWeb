@@ -77,6 +77,9 @@ dependencies {
 
     // Facebook4j
     implementation 'org.facebook4j:facebook4j-core:2.4.12'
+
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+    implementation 'commons-io:commons-io:2.11.0'
 }
 
 test {

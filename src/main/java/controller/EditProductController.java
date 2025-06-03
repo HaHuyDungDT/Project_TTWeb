@@ -134,23 +134,7 @@ public class EditProductController extends HttpServlet {
                 product.setCouponId(Integer.parseInt(couponIdStr));
             }
 
-            // Xử lý ảnh nếu người dùng chọn tải ảnh mới
-//            Part imagePart = request.getPart("imageFile"); // Lấy phần ảnh từ form
-//            String imageUrl = null;
-//            if (imagePart != null && imagePart.getSize() > 0) {
-//                // Lưu ảnh vào thư mục img
-//                String filename = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-//                String uploadPath = getServletContext().getRealPath("/img");
-//                File uploadDir = new File(uploadPath);
-//                if (!uploadDir.exists()) uploadDir.mkdirs();  // Tạo thư mục nếu không tồn tại
-//
-//                String fullPath = uploadPath + File.separator + filename;
-//                imagePart.write(fullPath);  // Lưu ảnh vào thư mục
-//
-//                // Lưu đường dẫn ảnh vào DB
-//                imageUrl = "img/" + filename;
-//                System.out.println("Ảnh mới đã được lưu với đường dẫn: " + imageUrl);
-//            }
+
             // Xử lý ảnh nếu người dùng chọn tải ảnh mới
             Part imagePart = request.getPart("imageFile"); // Lấy phần ảnh từ form
             String imageUrl = null;
@@ -172,7 +156,9 @@ public class EditProductController extends HttpServlet {
             }
 
             // Cập nhật sản phẩm trong cơ sở dữ liệu
-            boolean success = new ProductDAOImpl().updateProduct(product);
+//            boolean success = new ProductDAOImpl().updateProduct(product);
+            boolean success = productService.updateProduct(product);  // gọi service thay vì DAO trực tiếp
+
             System.out.println("Kết quả cập nhật sản phẩm: " + success);
 
             // Nếu có ảnh mới, cập nhật ảnh vào cơ sở dữ liệu

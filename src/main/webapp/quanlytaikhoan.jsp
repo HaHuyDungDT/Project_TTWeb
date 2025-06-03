@@ -114,43 +114,40 @@
     </ul>
     <!-- end nav right -->
 </div>
-
+<br>
 <!-- end navbar -->
 <!-- sidebar -->
 <div class="sidebar">
     <ul class="sidebar-nav">
+
         <li class="sidebar-nav-item">
-            <a href="thongso.jsp" class="sidebar-nav-link" style="margin-top: 20px;">
+            <a href="/admin" class="sidebar-nav-link">
                 <div>
-                    <i class="fa-solid fa-signal"></i>
+                    <i class="fa fa-user"></i>
                 </div>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="/thongke" class="sidebar-nav-link" >
+                <div><i class="fa-solid fa-signal"></i></div>
                 <span>Thông số bán hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="admin.jsp" class="sidebar-nav-link">
-                <div>
-                    <i class="fa fa-user"></i>
-                </div>
-                <span>Quản lý nhân viên</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item">
-            <a href="quanlysanpham.jsp" class="sidebar-nav-link">
-                <div>
-                    <i class="fa fa-mobile"></i>
-                </div>
+            <a href="/quanlysanpham" class="sidebar-nav-link">
+                <div><i class="fa fa-mobile"></i></div>
                 <span>Quản lý sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+            <a href="/storeCategory" class="sidebar-nav-link">
                 <div><i class="fas fa-list-alt"></i></div>
                 <span>Quản lý danh mục sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
+            <a href="/quanlydonhang" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
@@ -158,33 +155,31 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlytaikhoan" class="sidebar-nav-link">
+            <a href="/quanlytaikhoan" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-circle-user"></i>
                 </div>
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
+        <!-- Thêm mục Quản lý tồn kho -->
+        <li class="sidebar-nav-item">
+            <a href="/quanlytonkho" class="sidebar-nav-link">
+                <div>
+                    <i class="fa-solid fa-boxes-stacked"></i> <!-- icon tồn kho -->
+                </div>
+                <span>Quản lý tồn kho</span>
+            </a>
+        </li>
     </ul>
 </div>
+
+
 <!-- end sidebar -->
 <!-- main content -->
 <div class="wrapper">
     <div class="row">
         <div class="col-8 col-m-12 col-sm-12">
-
-            <c:if test="${not empty successMessage}">
-                <div class="alert alert-success text-center" style="margin: 10px;">
-                        ${successMessage}
-                </div>
-                <script>
-                    $(document).ready(function () {
-                        setTimeout(() => {
-                            $(".alert-success").fadeOut();
-                        }, 3000); // 3 giây tự động biến mất
-                    });
-                </script>
-            </c:if>
 
             <div class="card">
                 <div class="card-header" style="display: flex">
@@ -294,7 +289,7 @@
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" class="form-control" required name="password" id="editPassword">
+                        <input type="password" class="form-control" name="password" id="editPassword">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -397,6 +392,52 @@
 
 
 </div>
+<!-- Modal Thêm thành công -->
+<div class="modal fade" id="addSuccessModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-white rounded">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm thành công</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                Tài khoản đã được thêm thành công!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Sửa thành công -->
+<div class="modal fade" id="editSuccessModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-white rounded">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa thành công</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                Thông tin tài khoản đã được cập nhật thành công!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa thành công -->
+<div class="modal fade" id="deleteSuccessModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-white rounded">
+            <div class="modal-header">
+                <h5 class="modal-title">Xóa thành công</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                Tài khoản đã được xóa thành công!
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- end main content -->
 
 <!-- import script -->
@@ -509,6 +550,7 @@
             let email = $('#addEmail').val();
             let user = $('#addUser').val();
             let password = $('#addPassword').val();
+            console.log(name, address, date, phone, email, user, password);
 
             if (!name || !address || !date || !phone || !email || !user || !password) {
                 alert('Hãy nhập đầy đủ thông tin!');
@@ -560,6 +602,49 @@
     }); // ✅ ĐÓNG $(document).ready
 
 </script>
+<script>
+    function removeAscent(str) {
+        if (str === null || str === undefined) return '';
+        str = str.toLowerCase();
+        str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // bỏ dấu tiếng Việt
+        str = str.replace(/đ/g, "d").replace(/Đ/g, "D");
+        return str;
+    }
+</script>
+<!-- Thông báo Thêm -->
+<script>
+    $(document).ready(function () {
+        <% Boolean addSuccess = (Boolean) session.getAttribute("addAccountSuccess"); %>
+        <% if (addSuccess != null && addSuccess) { %>
+        $('#addSuccessModal').modal('show');
+        <% session.removeAttribute("addAccountSuccess"); %>
+        <% } %>
+    });
+</script>
+
+<!-- Thông báo Sửa -->
+<script>
+    $(document).ready(function () {
+        <% Boolean editSuccess = (Boolean) session.getAttribute("editAccountSuccess"); %>
+        <% if (editSuccess != null && editSuccess) { %>
+        $('#editSuccessModal').modal('show');
+        <% session.removeAttribute("editAccountSuccess"); %>
+        <% } %>
+    });
+</script>
+
+<!-- Thông báo Xóa -->
+<script>
+    $(document).ready(function () {
+        <% Boolean deleteSuccess = (Boolean) session.getAttribute("deleteAccountSuccess"); %>
+        <% if (deleteSuccess != null && deleteSuccess) { %>
+        $('#deleteSuccessModal').modal('show');
+        <% session.removeAttribute("deleteAccountSuccess"); %>
+        <% } %>
+    });
+</script>
+
+
 
 
 </body>

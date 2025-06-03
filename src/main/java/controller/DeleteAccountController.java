@@ -19,9 +19,11 @@ public class DeleteAccountController extends HttpServlet {
         try {
             Integer id = Integer.parseInt(req.getParameter("id"));
             userService.deleteById(id);  // Service → DAO
+            req.getSession().setAttribute("deleteAccountSuccess", true);
             resp.sendRedirect("/quanlytaikhoan?success=delete");
         } catch (Exception e) {
             e.printStackTrace();
+            req.getSession().setAttribute("deleteAccountSuccess", false); // có thể dùng để thông báo lỗi nếu muốn
             resp.sendRedirect("/quanlytaikhoan?error=deleteFailed");
         }
     }

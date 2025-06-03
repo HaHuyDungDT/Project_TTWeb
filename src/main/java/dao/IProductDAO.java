@@ -20,4 +20,12 @@ public interface IProductDAO {
     List<Product> findProductToImport();
     List<Product> findBestSeller();
     List<Product> findProductInStock();
+
+    void saveImage(int productId, String linkImage);
+
+    void deleteImagesByProductId(int productId);
+
+    List<Product> getProductsByPage(int pageIndex, int pageSize);
+    // Đếm tổng số sản phẩm
+    int countProducts();
 }

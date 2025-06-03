@@ -256,6 +256,23 @@ public class ProductServiceImpl implements IProductService {
         return producerDAO.findAll(); // hoặc trả về danh sách Producer theo logic cụ thể
     }
 
+    @Override
+    public List<Product> getProductsByPage(int pageIndex, int pageSize) {
+        List<Product> products = productDAO.getProductsByPage(pageIndex, pageSize);
+        for (Product product : products) {
+            product.setImages(imageDAO.findByProductId(product.getId()));
+            product.setProductType(productTypeDAO.findById(product.getProductTypeID()));
+            product.setProducer(producerDAO.findById(product.getProducerID()));
+        }
+        return products;
+    }
+
+    @Override
+    public int countProducts() {
+        return productDAO.countProducts();
+    }
+
+
     private void clearProductCache() {
         CacheManager.remove(CACHE_KEY_ALL_PRODUCTS);
         CacheManager.remove(CACHE_KEY_NEW_PRODUCTS);

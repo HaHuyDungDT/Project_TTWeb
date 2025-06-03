@@ -85,18 +85,19 @@ public class AddAccountController extends HttpServlet {
             System.out.println(user);
             if (userService.isEmailExists(user.getEmail()) || userService.isUsernameExists(user.getUsername())) {
                 req.setAttribute("errorMessage", "Email hoặc Username đã tồn tại!");
-                req.getRequestDispatcher("/quanlytaikhoan").forward(req, resp); // 🔄 quay lại JSP cũ
+                req.getRequestDispatcher("/quanlytaikhoan").forward(req, resp);
                 return;
             }
             boolean success = userService.add(user);
 
             if (success) {
                 HttpSession session = req.getSession();
-                session.setAttribute("successMessage", "Thêm tài khoản thành công!");
+                session.setAttribute("addAccountSuccess", true);
                 resp.sendRedirect("/quanlytaikhoan");
                 return;
             } else {
-                req.setAttribute("errorMessage", "Thêm người dùng thất bại.");
+                HttpSession session = req.getSession();
+                session.setAttribute("addAccountSuccess", false);
                 req.getRequestDispatcher("/quanlytaikhoan").forward(req, resp);
             }
         } catch (Exception e) {
@@ -104,34 +105,7 @@ public class AddAccountController extends HttpServlet {
             req.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
             req.getRequestDispatcher("/quanlytaikhoan").forward(req, resp);
         }
-//            if (userService.isEmailExists(user.getEmail()) || userService.isUsernameExists(user.getUsername())) {
-//                resp.getWriter().write("{\"message\":\"Email hoặc username đã tồn tại.\"}");
-//                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//                return;
-//            }
-//            if (success) {
-//                System.out.println("User added successfully");
-//                resp.sendRedirect("/quanlytaikhoan");
-//            } else {
-//                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "khong the them nguoi dung.");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace(); // xem log ở console
-//            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi khi xử lý dữ liệu: " + e.getMessage());
-//        }
-        // Kiểm tra sự tồn tại của email và username
 
-//
-//            // Thêm người dùng vào cơ sở dữ liệu
-//            userService.add(user, req.getParameter("role"));
-//            resp.getWriter().write("{\"message\":\"Thêm tài khoản thành công!\"}");
-//            resp.sendRedirect("/quanlytaikhoan");
-//            resp.setStatus(HttpServletResponse.SC_OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//            resp.getWriter().write("{\"message\":\"Đã xảy ra lỗi. Vui lòng thử lại.\"}");
-//        }
     }
 
 }

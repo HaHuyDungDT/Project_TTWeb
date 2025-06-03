@@ -2,6 +2,7 @@ package dao.impl;
 
 import dao.IProductDAO;
 import db.JDBIConnector;
+import model.Image;
 import model.Product;
 
 import java.time.LocalDate;
@@ -77,17 +78,7 @@ public boolean addProduct(Product product) {
 
     @Override
     public boolean updateProduct(Product product) {
-//        int rowsAffected = JDBIConnector.getConnect().withHandle(handle ->
-//                handle.createUpdate("UPDATE products SET name = :name, price = :price, product_type_id = :productTypeId, producer_id = :producerId, detail = :detail WHERE id = :productId")
-//                        .bind("name", product.getName())
-//                        .bind("price", product.getPrice())
-//                        .bind("productTypeId", product.getProductType().getId())
-//                        .bind("producerId", product.getProducer().getId())
-//                        .bind("detail", product.getDetail())
-//                        .bind("productId", product.getId())
-//                        .execute()
-//        );
-//        return rowsAffected > 0;
+
         String sql = "UPDATE products SET name = ?, price = ?, quantity = ?, detail = ?, product_type_id = ?, producer_id = ?, status = ?, import_date = ?, coupon_id = ? WHERE id = ?";
         return JDBIConnector.getConnect().withHandle(handle -> {
             return handle.createUpdate(sql)
@@ -126,22 +117,57 @@ public boolean addProduct(Product product) {
         return products;
     }
 
-    @Override
-    public Product findById(Integer id) {
-        Product product = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createQuery(BASE_QUERY + " AND id = :id")
-                    .bind("id", id)
-                    .mapToBean(Product.class)
-                    .findFirst()
-                    .orElse(null);
-        });
-        if (product != null) {
-            System.out.println("Product found in DB: " + product);
-        } else {
-            System.out.println("No product found with ID: " + id);
-        }
-        return product;
+
+    // Ví dụ hàm load ảnh
+    private List<Image> loadImagesByProductId(int productId) {
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery("SELECT * FROM images WHERE product_id = :productId")
+                        .bind("productId", productId)
+                        .mapToBean(Image.class)
+                        .list()
+        );
     }
+
+
+    //    @Override
+//    public Product findById(Integer id) {
+//        Product product = JDBIConnector.getConnect().withHandle(handle -> {
+//            return handle.createQuery(BASE_QUERY + " AND id = :id")
+//                    .bind("id", id)
+//                    .mapToBean(Product.class)
+//                    .findFirst()
+//                    .orElse(null);
+//        });
+//        if (product != null) {
+//            System.out.println("Product found in DB: " + product);
+//        } else {
+//            System.out.println("No product found with ID: " + id);
+//        }
+//        return product;
+//    }
+@Override
+public Product findById(Integer id) {
+    Product product = JDBIConnector.getConnect().withHandle(handle -> {
+        return handle.createQuery(BASE_QUERY + " AND id = :id")
+                .bind("id", id)
+                .mapToBean(Product.class)
+                .findFirst()
+                .orElse(null);
+    });
+
+    if (product != null) {
+        List<Image> images = JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery("SELECT * FROM images WHERE product_id = :id")
+                        .bind("id", id)
+                        .mapToBean(model.Image.class)
+                        .list()
+        );
+        product.setImages(images);
+    }
+
+    return product;
+}
+
 
 
 
@@ -274,6 +300,44 @@ public boolean addProduct(Product product) {
         });
         return products;
     }
+    @Override
+    public void saveImage(int productId, String linkImage) {
+        JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createUpdate("INSERT INTO images (link_image, product_id) VALUES (:linkImage, :productId)")
+                    .bind("linkImage", linkImage)
+                    .bind("productId", productId)
+                    .execute();
+        });
+    }
+@Override
+public void deleteImagesByProductId(int productId) {
+        JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createUpdate("DELETE FROM images WHERE product_id = :productId")
+                    .bind("productId", productId)
+                    .execute();
+        });
+    }
+    @Override
+    public List<Product> getProductsByPage(int pageIndex, int pageSize) {
+        int offset = (pageIndex - 1) * pageSize;
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery(BASE_QUERY + " ORDER BY id LIMIT :pageSize OFFSET :offset")
+                        .bind("pageSize", pageSize)
+                        .bind("offset", offset)
+                        .mapToBean(Product.class)
+                        .list()
+        );
+    }
+    @Override
+    public int countProducts() {
+        return JDBIConnector.getConnect().withHandle(handle ->
+                handle.createQuery("SELECT COUNT(*) FROM products WHERE active = 1")
+                        .mapTo(Integer.class)
+                        .one()
+        );
+    }
+
+
 
     public static void main(String[] args) {
         ProductDAOImpl p = new ProductDAOImpl();

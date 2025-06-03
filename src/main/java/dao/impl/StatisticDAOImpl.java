@@ -23,7 +23,7 @@ public class StatisticDAOImpl implements IStatisticDAO {
 
     @Override
     public double calculateRevenueThisMonth() {
-        String sql = "SELECT SUM(total_price) FROM orders WHERE MONTH(order_date) = MONTH(CURDATE()) AND YEAR(order_date) = YEAR(CURDATE())";
+        String sql = "SELECT SUM(total_price) FROM orders WHERE MONTH(order_date) = MONTH(CURDATE()) AND YEAR(order_date) = YEAR(CURDATE()) AND status = 'Hoàn tất'";
         return queryDouble(sql);
     }
 
@@ -48,7 +48,7 @@ public class StatisticDAOImpl implements IStatisticDAO {
 
     @Override
     public double calculateRevenueInRecent3Months() {
-        String sql = "SELECT SUM(total_price) FROM orders WHERE order_date BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW()";
+        String sql = "SELECT SUM(total_price) FROM orders WHERE order_date BETWEEN DATE_SUB(NOW(), INTERVAL 3 MONTH) AND NOW() AND status = 'Hoàn tất'";
         return queryDouble(sql);
     }
 
@@ -71,7 +71,8 @@ public class StatisticDAOImpl implements IStatisticDAO {
 
     @Override
     public double calculateRevenueAll() {
-        return queryDouble("SELECT SUM(total_price) FROM orders");
+        String sql = "SELECT SUM(total_price) FROM orders WHERE status = 'Hoàn tất'";
+        return queryDouble(sql);
     }
 
     @Override
@@ -106,7 +107,7 @@ public class StatisticDAOImpl implements IStatisticDAO {
 
     @Override
     public double calculateRevenueByMonth(int month, int year) {
-        String sql = "SELECT SUM(total_price) FROM orders WHERE MONTH(order_date) = :month AND YEAR(order_date) = :year";
+        String sql = "SELECT SUM(total_price) FROM orders WHERE MONTH(order_date) = :month AND YEAR(order_date) = :year AND status = 'Hoàn tất'";
         return queryDouble(sql, month, year);
     }
 

@@ -150,38 +150,35 @@
 <!-- sidebar -->
 <div class="sidebar">
     <ul class="sidebar-nav">
+
         <li class="sidebar-nav-item">
-            <a href="thongso.jsp" class="sidebar-nav-link" style="margin-top: 20px;">
+            <a href="/admin" class="sidebar-nav-link">
                 <div>
-                    <i class="fa-solid fa-signal"></i>
+                    <i class="fa fa-user"></i>
                 </div>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="/thongke" class="sidebar-nav-link" >
+                <div><i class="fa-solid fa-signal"></i></div>
                 <span>Thông số bán hàng</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="admin.jsp" class="sidebar-nav-link">
-                <div>
-                    <i class="fa fa-user"></i>
-                </div>
-                <span>Quản lý nhân viên</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item">
-            <a href="quanlysanpham.jsp" class="sidebar-nav-link">
-                <div>
-                    <i class="fa fa-mobile"></i>
-                </div>
+            <a href="/quanlysanpham" class="sidebar-nav-link">
+                <div><i class="fa fa-mobile"></i></div>
                 <span>Quản lý sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlydanhmuc.jsp" class="sidebar-nav-link">
+            <a href="/storeCategory" class="sidebar-nav-link">
                 <div><i class="fas fa-list-alt"></i></div>
                 <span>Quản lý danh mục sản phẩm</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlydonhang.jsp" class="sidebar-nav-link">
+            <a href="/quanlydonhang" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
@@ -189,15 +186,25 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlytaikhoan" class="sidebar-nav-link">
+            <a href="/quanlytaikhoan" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-circle-user"></i>
                 </div>
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
+        <!-- Thêm mục Quản lý tồn kho -->
+        <li class="sidebar-nav-item">
+            <a href="/quanlytonkho" class="sidebar-nav-link">
+                <div>
+                    <i class="fa-solid fa-boxes-stacked"></i> <!-- icon tồn kho -->
+                </div>
+                <span>Quản lý tồn kho</span>
+            </a>
+        </li>
     </ul>
 </div>
+
 <!-- end sidebar -->
 
 <!-- MAIN CONTENT -->

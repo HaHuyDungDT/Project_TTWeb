@@ -25,5 +25,9 @@ public interface IProductService {
 
     List<ProductType> getProductTypes();
     List<Producer> getProducers();
+
+    List<Product> getProductsByPage(int pageIndex, int pageSize);
+
+    int countProducts();
 }
 

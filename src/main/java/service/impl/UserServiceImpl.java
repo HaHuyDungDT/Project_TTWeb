@@ -219,4 +219,9 @@ public class UserServiceImpl implements IUserService {
         IUserDao userDao = new UserDaoImpl();
         return userDao.getByOAuthUser(id);
     }
+
+    @Override
+    public boolean updateRole(int userId, int newRoleId) {
+        return userDao.updateRole(userId, newRoleId);
+    }
 }

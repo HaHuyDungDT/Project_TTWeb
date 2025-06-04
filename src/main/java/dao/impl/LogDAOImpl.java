@@ -3,46 +3,50 @@ package dao.impl;
 import dao.ILogDAO;
 import db.JDBIConnector;
 import model.Log;
+import utils.LevelLog;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class LogDAOImpl implements ILogDAO {
-    Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+    private static final String INSERT_LOG = "INSERT INTO logs (level, action, address_ip, user_id, created_at) VALUES (:level, :action, :addressIP, :userId, :createdAt)";
+    private static final String SELECT_ALL_LOGS = "SELECT * FROM logs ORDER BY created_at DESC";
+    private static final String SELECT_LOGS_BY_USER = "SELECT * FROM logs WHERE user_id = :userId ORDER BY created_at DESC";
 
     @Override
-    public Log save(Log log) {
-        return JDBIConnector.getConnect().withHandle(handle -> {
-            handle.createUpdate("INSERT INTO logs(level, action, address_ip, user_id, created_at) VALUES (?, ?, ?, ?, ?)")
-                    .bind(0, log.getLevel())
-                    .bind(1, log.getAction())
-                    .bind(2, log.getAddressIP())
-                    .bind(3, log.getUserId())
-                    .bind(4, currentTimestamp)
+    public void save(Log log) {
+        // Set current time if created_at is null
+        if (log.getCreatedAt() == null) {
+            log.setCreatedAt(LocalDateTime.now());
+        }
+        
+        JDBIConnector.getConnect().useHandle(handle -> {
+            handle.createUpdate(INSERT_LOG)
+                    .bind("level", log.getLevel().toString())
+                    .bind("action", log.getAction())
+                    .bind("addressIP", log.getAddressIP())
+                    .bind("userId", log.getUserId())
+                    .bind("createdAt", log.getCreatedAt())
                     .execute();
-            return log;
         });
     }
 
-
     @Override
     public List<Log> findAll() {
-       List<Log> logs = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createQuery("SELECT id, level, action, address_ip, user_id, created_at FROM logs")
+        return JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createQuery(SELECT_ALL_LOGS)
                     .mapToBean(Log.class)
                     .list();
         });
-        return logs;
     }
 
     @Override
     public List<Log> findByUserId(int userId) {
-        List<Log> logs = JDBIConnector.getConnect().withHandle(handle -> {
-            return handle.createQuery("SELECT id, level, action, address_ip, user_id, created_at FROM logs WHERE user_id = ?")
-                    .bind(0, userId)
+        return JDBIConnector.getConnect().withHandle(handle -> {
+            return handle.createQuery(SELECT_LOGS_BY_USER)
+                    .bind("userId", userId)
                     .mapToBean(Log.class)
                     .list();
         });
-        return logs;
     }
 }

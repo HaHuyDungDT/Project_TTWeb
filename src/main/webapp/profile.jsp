@@ -3,9 +3,12 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%
     int currentYear = LocalDate.now().getYear();
     request.setAttribute("currentYear", currentYear);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    request.setAttribute("formatter", formatter);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,17 +25,14 @@
     <!-- Slick -->
     <link type="text/css" rel="stylesheet" href="css/slick.css"/>
     <link type="text/css" rel="stylesheet" href="css/slick-theme.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          integrity="sha512-papN8Auqwsb5Jnu3hU0MGLuedlitO+lQ9B+8R4zbmlF+M8sN+IN0KjhWtmjSel6BxGR+N4e244MQ7vq6QQP2mw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link type="text/css" rel="stylesheet" href="css/nouislider.min.css"/>
     <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- stlylesheet -->
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <link rel="icon" href="./img/logo.png" type="image/x-icon"/>
-    <link rel="stylesheet" href="css/font-awesome.min.css"/>
     <!-- jQuery Plugins -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -41,7 +41,6 @@
     <script src="js/jquery.zoom.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="stylesheet" href="css/font-awesome.min.css"/>
     <style>
         /* Các style CSS dành riêng cho trang Profile */
         .profile-container {
@@ -238,6 +237,79 @@
         #uploadBtn:active {
             transform: scale(0.98);
         }
+
+        /* Order History Styles */
+        .order-history {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .order-history .table {
+            margin-bottom: 0;
+        }
+
+        .order-history .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .order-history .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .badge-secondary {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .order-history .table {
+                font-size: 14px;
+            }
+            
+            .order-history .table th,
+            .order-history .table td {
+                padding: 8px;
+            }
+        }
+
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .sidebar a[data-tab] {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -254,116 +326,140 @@
     <div class="sidebar">
         <div class="section-title"><i class="fas fa-address-card"></i> Tài Khoản</div>
         <ul>
-            <li><a href="#" class="active"><i class="fas fa-user-circle"></i> Hồ Sơ</a></li>
-            <li><a href="#"><i class="fas fa-university"></i> Ngân Hàng</a></li>
-            <li><a href="#"><i class="fas fa-map-marker-alt"></i> Địa Chỉ</a></li>
+            <li><a href="#" class="active" data-tab="profile"><i class="fas fa-user-circle"></i> Hồ Sơ</a></li>
+            <li><a href="#" data-tab="orders"><i class="fas fa-history"></i> Lịch Sử Mua Hàng</a></li>
             <li><a href="changePassword"><i class="fas fa-key"></i> Đổi Mật Khẩu</a></li>
-            <li><a href="#"><i class="fas fa-bell"></i> Cài Đặt Thông Báo</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Những Thiết Lập Riêng Tư</a></li>
-        </ul>
-        <div class="section-title"><i class="fas fa-shopping-cart"></i> Đơn Hàng</div>
-        <ul>
-            <li><a href="#"><i class="fas fa-file-alt"></i> Đơn Mua</a></li>
-            <li><a href="#"><i class="fas fa-gift"></i> Kho Voucher</a></li>
-            <li><a href="#"><i class="fas fa-coins"></i> Phukienphone Xu</a></li>
-            <li><a href="#"><i class="fas fa-star"></i> Siêu Hội Freeship</a></li>
-        </ul>
-        <div class="section-title"><i class="fas fa-ellipsis-h"></i> Khác</div>
-        <ul>
-            <li><a href="#"><i class="fas fa-question-circle"></i> Trợ Giúp</a></li>
-            <li><a href="#"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
         </ul>
     </div>
 
     <div class="content">
-        <h2 class="profile-title">Hồ Sơ Của Tôi</h2>
-        <c:choose>
-            <c:when test="${user.twoFaEnabled}">
-                <p class="text-success" style="font-size:16px;">Xác thực hai lớp (2FA) đã được bật.</p>
-            </c:when>
-            <c:otherwise>
-                <p class="text-warning" style="font-size:16px;">
-                    Bạn chưa bật xác thực hai lớp (2FA). Vui lòng nhấn vào
-                    <a href="changePassword" style="color:#ff5722; font-weight:bold;">Đổi Mật Khẩu</a> để kích hoạt.
-                </p>
-            </c:otherwise>
-        </c:choose>
-        <p class="profile-subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+        <!-- Profile Section -->
+        <div id="profile" class="tab-content active">
+            <h2 class="profile-title">Hồ Sơ Của Tôi</h2>
+            <c:choose>
+                <c:when test="${user.twoFaEnabled}">
+                    <p class="text-success" style="font-size:16px;">Xác thực hai lớp (2FA) đã được bật.</p>
+                </c:when>
+                <c:otherwise>
+                    <p class="text-warning" style="font-size:16px;">
+                        Bạn chưa bật xác thực hai lớp (2FA). Vui lòng nhấn vào
+                        <a href="changePassword" style="color:#ff5722; font-weight:bold;">Đổi Mật Khẩu</a> để kích hoạt.
+                    </p>
+                </c:otherwise>
+            </c:choose>
+            <p class="profile-subtitle">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
 
-        <div class="row">
-            <div class="col-md-8">
-                <form id="profileForm"
-                      action="${pageContext.request.contextPath}/api/profile/update"
-                      method="post"
-                      enctype="multipart/form-data"
-                      accept-charset="UTF-8">
-                    <div class="form-group">
-                        <label class="form-label">OAuth User ID</label>
-                        <input type="text" name="id" value="${user.oauthUid}" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tên đăng nhập</label>
-                        <input type="text" name="username" value="${user.username}" readonly />
-                        <small>Tên đăng nhập chỉ có thể thay đổi một lần.</small>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tên</label>
-                        <input id="nameInput"
-                               type="text"
-                               name="name"
-                               placeholder="Nhập tên của bạn"
-                               value="${user.name}"
-                               class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input id="emailInput" type="email" name="email" value="${user.email}" readonly />
-                        <button id="changeEmailBtn" type="button" style="color: blue; background:none; border:none; cursor:pointer;">Thay Đổi</button>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Số điện thoại</label>
-                        <input id="phoneInput"
-                               type="text"
-                               name="phone"
-                               class="form-control"
-                               value="${user.phone}" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Giới tính</label>
-                        <div>
-                            <label>
-                                <input type="radio" name="gender" value="Nam"
-                                       <c:if test="${user.gender == 'Nam'}">checked</c:if> /> Nam
-                            </label>
-                            <label style="margin-left:20px">
-                                <input type="radio" name="gender" value="Nữ"
-                                       <c:if test="${user.gender == 'Nữ'}">checked</c:if> /> Nữ
-                            </label>
+            <div class="row">
+                <div class="col-md-8">
+                    <form id="profileForm"
+                          action="${pageContext.request.contextPath}/api/profile/update"
+                          method="post"
+                          enctype="multipart/form-data"
+                          accept-charset="UTF-8">
+                        <div class="form-group">
+                            <label class="form-label">OAuth User ID</label>
+                            <input type="text" name="id" value="${user.oauthUid}" readonly />
                         </div>
-                    </div>
-                    <!-- ... -->
-                    <button type="submit" class="save-button">Lưu</button>
-                </form>
-            </div>
-            <div class="col-md-4">
-                <div class="text-center">
-                    <c:choose>
-                        <c:when test="${not empty user.picture}">
-                            <img src="${user.picture}" alt="Avatar" class="avatar-img">
-                        </c:when>
-                        <c:otherwise>
-                            <div style="width:100px; height:100px; border-radius:50%; background-color:#ccc;
-                                    display:flex; align-items:center; justify-content:center;
-                                    font-size:36px; color:#fff; margin:0 auto;">
-                                    ${fn:substring(user.name, 0, 1)}
+                        <div class="form-group">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input type="text" name="username" value="${user.username}" readonly />
+                            <small>Tên đăng nhập chỉ có thể thay đổi một lần.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tên</label>
+                            <input id="nameInput"
+                                   type="text"
+                                   name="name"
+                                   placeholder="Nhập tên của bạn"
+                                   value="${user.name}"
+                                   class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input id="emailInput" type="email" name="email" value="${user.email}" readonly />
+                            <button id="changeEmailBtn" type="button" style="color: blue; background:none; border:none; cursor:pointer;">Thay Đổi</button>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại</label>
+                            <input id="phoneInput"
+                                   type="text"
+                                   name="phone"
+                                   class="form-control"
+                                   value="${user.phone}" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Giới tính</label>
+                            <div>
+                                <label>
+                                    <input type="radio" name="gender" value="Nam"
+                                           <c:if test="${user.gender == 'Nam'}">checked</c:if> /> Nam
+                                </label>
+                                <label style="margin-left:20px">
+                                    <input type="radio" name="gender" value="Nữ"
+                                           <c:if test="${user.gender == 'Nữ'}">checked</c:if> /> Nữ
+                                </label>
                             </div>
-                        </c:otherwise>
-                    </c:choose>
-                    <form id="uploadForm" enctype="multipart/form-data" method="post" action="api/avatar/upload">
-                        <input type="file" name="avatar" id="avatarInput" accept="image/jpeg, image/png" style="display: none">
-                        <button type="button" id="uploadBtn">⬆ Chọn Ảnh</button>
+                        </div>
+                        <button type="submit" class="save-button">Lưu</button>
                     </form>
                 </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <c:choose>
+                            <c:when test="${not empty user.picture}">
+                                <img src="${user.picture}" alt="Avatar" class="avatar-img">
+                            </c:when>
+                            <c:otherwise>
+                                <div style="width:100px; height:100px; border-radius:50%; background-color:#ccc;
+                                        display:flex; align-items:center; justify-content:center;
+                                        font-size:36px; color:#fff; margin:0 auto;">
+                                        ${fn:substring(user.name, 0, 1)}
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="api/avatar/upload">
+                            <input type="file" name="avatar" id="avatarInput" accept="image/jpeg, image/png" style="display: none">
+                            <button type="button" id="uploadBtn">⬆ Chọn Ảnh</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History Section -->
+        <div id="orders" class="tab-content">
+            <h2 class="profile-title">Lịch Sử Mua Hàng</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Ngày đặt</th>
+                            <th>Địa chỉ</th>
+                            <th>Số điện thoại</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${orders}" var="order">
+                            <tr>
+                                <td>#${order.id}</td>
+                                <td>${order.orderDate.format(formatter)}</td>
+                                <td>${order.address}</td>
+                                <td>${order.phone_number}</td>
+                                <td>
+                                    <span class="badge ${order.status == 'Chờ xác nhận đơn hàng' ? 'badge-warning' : 
+                                                      order.status == 'Đang giao hàng' ? 'badge-info' : 
+                                                      order.status == 'Đã giao hàng' ? 'badge-success' : 'badge-secondary'}">
+                                        ${order.status}
+                                    </span>
+                                </td>
+                                <td><fmt:formatNumber value="${order.totalPrice}" type="currency" currencySymbol="₫"/></td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -372,8 +468,23 @@
 <!-- FOOTER -->
 <jsp:include page="footer.jsp"/>
 <!-- /FOOTER -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    // Tab switching functionality
+    $('.sidebar a[data-tab]').click(function(e) {
+        e.preventDefault();
+        const tabId = $(this).data('tab');
+        
+        // Update active state in sidebar
+        $('.sidebar a').removeClass('active');
+        $(this).addClass('active');
+        
+        // Show selected tab content
+        $('.tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
     $('#profileForm').on('submit', function(e) {
         e.preventDefault();
         var form = this, data = new FormData(form);
@@ -386,7 +497,6 @@
             headers: {'X-Requested-With':'XMLHttpRequest'},
             success: function(res) {
                 if (res.ok) {
-                    // cập nhật Name, Phone, Gender
                     $('#nameInput').val(res.name);
                     $('#phoneInput').val(res.phone);
                     $('input[name=gender][value="' + res.gender + '"]').prop('checked', true);
@@ -401,6 +511,7 @@
         });
     });
 </script>
+
 <script>
     // Khi nhấn nút Upload Profile thì mở hộp chọn file
     document.getElementById("uploadBtn").addEventListener("click", function(){

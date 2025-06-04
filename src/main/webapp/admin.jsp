@@ -6,10 +6,12 @@
 <%@ page import="model.User" %>
 <%@ page import="dao.impl.UserDaoImpl" %>
 <%
-    String userId = (String) SessionUtil.getInstance().getKey((HttpServletRequest) request, "user");
-    User currentUser = userId != null ? new UserDaoImpl().getUserByUserId(Integer.parseInt(userId)) : null;
-    if (currentUser == null || "0".equals(currentUser.getRoleId())) {
+    // Kiểm tra đăng nhập & phân quyền
+    User user = (User) SessionUtil.getInstance()
+            .getKey((javax.servlet.http.HttpServletRequest) request, "user");
+    if (user == null || (user.getRoleId() != 1 && user.getRoleId() != 2)) {
         response.sendRedirect("dangnhap.jsp");
+        return;
     }
 %>
 
@@ -125,7 +127,6 @@
 <!-- sidebar -->
 <div class="sidebar">
     <ul class="sidebar-nav">
-
         <li class="sidebar-nav-item">
             <a href="/admin" class="sidebar-nav-link">
                 <div>
@@ -147,7 +148,7 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="/storeCategory" class="sidebar-nav-link">
+            <a href="/quanlydanhmuc.jsp" class="sidebar-nav-link">
                 <div><i class="fas fa-list-alt"></i></div>
                 <span>Quản lý danh mục sản phẩm</span>
             </a>
@@ -168,13 +169,20 @@
                 <span>Quản lý tài khoản</span>
             </a>
         </li>
-        <!-- Thêm mục Quản lý tồn kho -->
         <li class="sidebar-nav-item">
             <a href="/quanlytonkho" class="sidebar-nav-link">
                 <div>
-                    <i class="fa-solid fa-boxes-stacked"></i> <!-- icon tồn kho -->
+                    <i class="fa-solid fa-boxes-stacked"></i>
                 </div>
                 <span>Quản lý tồn kho</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="/quanlylog.jsp" class="sidebar-nav-link ">
+                <div>
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <span>Quản lý log</span>
             </a>
         </li>
     </ul>

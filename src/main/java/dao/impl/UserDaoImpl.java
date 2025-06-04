@@ -383,4 +383,25 @@ public class UserDaoImpl implements IUserDao {
             return false;
         }
     }
+
+    @Override
+    public boolean updateRole(int userId, int newRoleId) {
+        try {
+            System.out.println("Updating role for user " + userId + " to role " + newRoleId);
+            boolean result = JDBIConnector.getConnect().withHandle(handle -> {
+                int rowsAffected = handle.createUpdate("UPDATE users SET role_id = :roleId WHERE id = :userId")
+                        .bind("roleId", newRoleId)
+                        .bind("userId", userId)
+                        .execute();
+                System.out.println("Rows affected: " + rowsAffected);
+                return rowsAffected > 0;
+            });
+            System.out.println("Update result: " + result);
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error updating role: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

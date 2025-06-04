@@ -14,6 +14,8 @@ import javax.servlet.http.*;
 import model.User;
 import service.IUserService;
 import service.impl.UserServiceImpl;
+import service.impl.LogServiceImpl;
+import utils.SessionUtil;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 @WebServlet(name = "addAccount", value = "/quanlytaikhoan/account-add")
 public class AddAccountController extends HttpServlet {
     private IUserService userService = new UserServiceImpl();
+    private LogServiceImpl logService = new LogServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -57,6 +60,10 @@ public class AddAccountController extends HttpServlet {
         resp.setContentType("application/json");
 
         try {
+            // Get current admin user
+            User adminUser = (User) SessionUtil.getInstance().getKey(req, "user");
+            String adminUsername = adminUser != null ? adminUser.getUsername() : "Unknown";
+
             // Chuyển đổi dữ liệu từ form thành đối tượng User
             User user = new User();
             user.setUsername(req.getParameter("user"));
@@ -91,6 +98,12 @@ public class AddAccountController extends HttpServlet {
             boolean success = userService.add(user);
 
             if (success) {
+                // Log warning for account creation
+                logService.warning(String.format("Admin %s created new account: %s (Role: %d)", 
+                    adminUsername, 
+                    user.getUsername(), 
+                    user.getRoleId()));
+                
                 HttpSession session = req.getSession();
                 session.setAttribute("addAccountSuccess", true);
                 resp.sendRedirect("/quanlytaikhoan");

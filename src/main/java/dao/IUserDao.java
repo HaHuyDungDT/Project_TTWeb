@@ -31,4 +31,5 @@ public interface IUserDao {
                           String gender, LocalDate birth);
     // Update updateAddress method: sử dụng userId và các thành phần địa chỉ để tạo chuỗi fullAddress.
     boolean updateAddress(int userId, String province, String city, String commune, String street);
+    boolean updateRole(int userId, int newRoleId);
 }
